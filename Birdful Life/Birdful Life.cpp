@@ -10,7 +10,7 @@
 #define GAME_COLOR			32	    //画面のカラービット
 
 #define GAME_WINDOW_BAR		0					//タイトルバーはデフォルトにする
-#define GAME_WINDOW_NAME	"GAME TITLE"		//ウィンドウのタイトル
+#define GAME_WINDOW_NAME	"BIRDFULLIFE"		//ウィンドウのタイトル
 
 #define GAME_FPS			60	//FPSの数値	
 
