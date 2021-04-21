@@ -174,7 +174,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWindowStyleMode(GAME_WINDOW_BAR);				//タイトルバーはデフォルトにする
 	SetMainWindowText(TEXT(GAME_WINDOW_NAME));			//ウィンドウのタイトルの文字
 	SetAlwaysRunFlag(TRUE);								//非アクティブでも実行する
-	SetWindowIconID(IDI_ICON1);							//アイコンファイルを読込
+	//SetWindowIconID(IDI_ICON1);							//アイコンファイルを読込
 	SetWindowUserCloseEnableFlag(FALSE);				//閉じるボタンで、勝手にウィンドウが閉じないようにする
 
 	if (DxLib_Init() == -1) { return -1; }	//ＤＸライブラリ初期化処理
