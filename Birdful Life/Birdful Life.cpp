@@ -32,6 +32,9 @@
 #define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
 
+//画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
+#define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\")           //エンド背景ひなパターン
+
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
@@ -75,8 +78,7 @@ typedef struct STRUCT_FONT
 	int size;					//大きさ
 	int bold;					//太さ
 	int type;					//タイプ
-	//※タイプは、https://dxlib.xsrv.jp/function/dxfunc_graph2.html#R17N10　を参照
-
+	
 }FONT;
 
 typedef struct STRUCT_IMAGE
@@ -124,9 +126,11 @@ MOUSE mouse;
 int GameScene;		//ゲームシーンを管理
 
 //プレイヤー関連
-CHARA player;		//ゲームのキャラ
 
-//########## プロトタイプ宣言 ##########
+//画像関連 ※名前の付け方はImageシーン名何の画像か;
+IMAGE ImageEndBack1;                //エンド背景ひなパターン
+
+//########## プロトタイプ宣言 ##########//
 VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する
 VOID MY_FPS_DRAW(VOID);				//FPS値を描画する
 VOID MY_FPS_WAIT(VOID);				//FPS値を計測し、待つ
@@ -574,7 +578,7 @@ VOID MY_END(VOID)
 	MY_END_PROC();	//エンド画面の処理
 	MY_END_DRAW();	//エンド画面の描画
 
-
+	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
@@ -587,20 +591,31 @@ VOID MY_END_PROC(VOID)
 		GameScene = GAME_SCENE_START;
 	}
 
-	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
-
+	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 	return;
 }
 
 //画像をまとめて読み込む関数
 BOOL MY_LOAD_IMAGE(VOID)
 {
+	//エンド背景画像1
+	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		//パスの設定
+	ImageEndBack1.handle = LoadGraph(ImageEndBack1.path);	    //読み込み
+	if (ImageEndBack1.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_END_BACK1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndBack1.handle, &ImageEndBack1.width, &ImageEndBack1.height);	//画像の幅と高さを取得
+	ImageEndBack1.x = GAME_WIDTH / 2 - ImageEndBack1.width / 2;		                //左右中央揃え
+	ImageEndBack1.y = GAME_HEIGHT / 2 - ImageEndBack1.height / 2;	                    //上下中央揃え
 
 	return TRUE;
 }
@@ -608,7 +623,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-
+	DeleteGraph(ImageEndBack1.handle);
 	return;
 }
 
