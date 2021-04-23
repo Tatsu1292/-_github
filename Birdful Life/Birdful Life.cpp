@@ -33,7 +33,7 @@
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
-#define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\")           //エンド背景ひなパターン
+#define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
 
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
@@ -44,6 +44,14 @@
 //閉じるボタンを押したとき
 #define MSG_CLOSE_TITLE			TEXT("終了メッセージ")
 #define MSG_CLOSE_CAPTION		TEXT("ゲームを終了しますか？")
+
+//ひなセリフの表示
+#define MESSAGE_FONT_SIZE      100          //フォントの大きさ
+#define MESSAGE_MAX_LENGTH     1000          //最大文字数
+#define MESSAGE_MAX_LINE       20           //最大行数
+#define MESSAGE_BOX_X          700          //メッセージボックスのX座標
+#define MESSAGE_BOX_Y          50           //メッセージボックスのY座標
+#define MESSAGE_BOX_GRAPHIC_FILENAME       "./IMAGE/背景連続1.png"
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
@@ -130,6 +138,16 @@ int GameScene;		//ゲームシーンを管理
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageEndBack1;                //エンド背景ひなパターン
 
+//ひなセリフ関連
+char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
+char messageBuffer[MESSAGE_MAX_LINE][MESSAGE_MAX_LENGTH];   //メッセージを表示するための仮想バッファ
+static int currentCursor = 0;                               //何文字目まで表示しているか
+static int currentLineCursor = 0;                            //何行目を表示しているか
+static int whiteColor;
+static int blackColor;
+static int messageBoxGraphHandle;
+int isJapanese(unsigned char code);
+
 //########## プロトタイプ宣言 ##########//
 VOID MY_FPS_UPDATE(VOID);			//FPS値を計測、更新する
 VOID MY_FPS_DRAW(VOID);				//FPS値を描画する
@@ -168,6 +186,12 @@ VOID MY_DELETE_IMAGE(VOID);		//画像をまとめて削除する関数
 
 BOOL MY_LOAD_MUSIC(VOID);		//音楽をまとめて読み込む関数
 VOID MY_DELETE_MUSIC(VOID);		//音楽をまとめて削除する関数
+
+VOID writeSubstring(char* message, int start, int len,
+	int PosX, int PosY, int color, int bufferLine);
+VOID drawMessage(VOID);
+VOID setMessage(const char* ms);  //描画したいメッセージをセット
+
 
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -280,7 +304,7 @@ VOID MY_FPS_UPDATE(VOID)
 VOID MY_FPS_DRAW(VOID)
 {
 	//文字列を描画
-	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(255, 255, 255), "FPS:%.1f", CalcFps);
+	DrawFormatString(0, GAME_HEIGHT - 20, GetColor(255, 0, 0), "FPS:%.1f", CalcFps);
 	return;
 }
 
@@ -578,7 +602,7 @@ VOID MY_END(VOID)
 	MY_END_PROC();	//エンド画面の処理
 	MY_END_DRAW();	//エンド画面の描画
 
-	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -591,13 +615,26 @@ VOID MY_END_PROC(VOID)
 		GameScene = GAME_SCENE_START;
 	}
 
+	if (MY_MOUSE_DOWN(MOUSE_INPUT_LEFT) == TRUE)
+	{
+		setMessage("こんにちは");
+	}
+
+	
+
 	return;
 }
+
+	
+
 
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
 	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
+	
+	drawMessage();
+
 	return;
 }
 
@@ -639,4 +676,124 @@ VOID MY_DELETE_MUSIC(VOID)
 {
 
 	return;
+}
+
+int isJapanese(unsigned char code)
+{
+	if ((code >= 0x81 && code <= 0x9F) ||
+		(code >= 0xE0 && code <= 0xFC))
+	{
+		return 1;
+	}
+	return 0;
+}
+
+// m e s s a g eで指定した文章を start の 位 置 か ら len 文 字 分 表 示 す る
+void writeSubstring(char* message, int start, int len,
+	int posX, int posY, int color, int bufferLine)
+{
+	int i;
+	//文字数
+	int maxLen = strlen(message);
+
+	// s t a r t の 位 置 を 変 更 す る
+	// s t a r t の 位 置 ま で に 日 本 語 が で て き て い た ら ， 1 を 足 し て い く
+	for (i = 0; i < start && message[i] != '\0'; ) {
+		if (isJapanese(message[i])) {
+			//日本語の場合，2バ イ ト 分 す す め る
+			i += 2;
+			// s t a r tに1バイト分足す
+			start++;
+		}
+		else {
+			//半角文字の場合，1バ イ ト 分 進 め る
+			i++;
+		}
+	}
+	// s t a r t の 位 置 が 表 示 し た い 最 大 文 字 数 よ り 大 き い 場 合
+	if (start >= maxLen) {
+		return;
+
+	}
+
+	//指定した位置から l e n 文 字 分 表 示 す る
+	for (i = 0; i < len && message[start + i] != '\0'; ) {
+		if (isJapanese(message[start + i])) {
+			//日本語の場合，2文 字 分 b u f f e rにセット
+			messageBuffer[bufferLine][i] = message[start + i];
+			messageBuffer[bufferLine][i + 1] = message[start + i + 1];
+			// l e n は 日 本 語 な の で ， 1 バ イ ト 分 追 加 す る
+			len++;
+			//2バ イ ト 分 進 め る
+			i += 2;
+		}
+		else {
+			//半角文字1文 字 を セ ッ ト
+			messageBuffer[bufferLine][i] = message[start + i];
+			i++; //1バ イ ト 分 進 め る
+		}
+	}
+	messageBuffer[bufferLine][i] = '\0';
+	//メッセージ描画
+	DrawString(posX, posY, messageBuffer[bufferLine], color);
+}
+
+
+//メッセージ描画
+VOID drawMessage()
+{
+	int i;
+
+	//メッセージボックス描画
+	//DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxGraphHandle, FALSE);
+	DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
+
+	if (message[currentCursor] != '\0') {
+		currentCursor++;
+	}
+
+	// MESSAGE_MAX_LENGTH ま で 文 字 を 描 画 し た ら 段 落 を 切 り 替 え る
+	if (currentCursor % MESSAGE_MAX_LENGTH == 0) {
+		if (message[currentCursor] != '\0') {
+			currentLineCursor++;
+		}
+
+	}
+	
+	//メッセージ描画部分
+	for (i = 0; i < MESSAGE_MAX_LINE; i++) {
+		if (i == currentLineCursor) {
+			SetFontSize(MESSAGE_FONT_SIZE);
+			//メッセージ風に表示
+			writeSubstring(message, i * MESSAGE_MAX_LENGTH,
+				currentCursor - MESSAGE_MAX_LENGTH * i,
+				MESSAGE_BOX_X ,
+				MESSAGE_BOX_Y + MESSAGE_FONT_SIZE * i,
+				whiteColor, i);
+			break;
+
+		}
+		else {
+			SetFontSize(MESSAGE_FONT_SIZE);
+			//メッセージをそのまま表示
+			writeSubstring(message, i * MESSAGE_MAX_LENGTH,
+				MESSAGE_MAX_LENGTH, 
+				MESSAGE_BOX_X,
+				MESSAGE_BOX_Y + MESSAGE_FONT_SIZE * i,
+				whiteColor, i);
+
+		}
+
+	}
+	SetFontSize(16);
+}
+
+
+VOID setMessage(const char* ms)  //描画したいメッセージをセット
+{
+	currentCursor = 0;
+	currentLineCursor = 0;
+
+	strncpy(message, ms, MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE);   //メッセージをコピー
+	
 }
