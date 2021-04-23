@@ -126,6 +126,12 @@ typedef struct STRUCT_CHARA
 
 }CHARA;	//キャラクター構造体
 
+typedef struct STRUCT_IMAGE_BACK
+{
+	IMAGE image;		//IMAGE構造体
+	BOOL IsDraw;		//弾を表示できるか
+}IMAGE_BACK;	//背景画像の構造体
+
 //########## グローバル変数 ##########
 //FPS関連
 int StartTimeFps;				//測定開始時刻
@@ -148,6 +154,9 @@ int GameScene;		//ゲームシーンを管理
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;
 IMAGE ImageEndBack1;                //エンド背景ひなパターン
+
+//背景関連
+IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
 
 //ひなセリフ関連
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
@@ -557,6 +566,29 @@ VOID MY_START_PROC(VOID)
 
 		return;
 	}
+	//背景画像を動かす
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		//画像を移動させる
+		ImageTitleBack[num].image.x--;//右から左に流れる
+
+		//背景画像を描画できないとき
+		if (ImageTitleBack[num].IsDraw == FALSE)
+		{
+			//背景画像が画面内にいるとき
+			if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width > 0)
+			{
+				ImageTitleBack[num].IsDraw = TRUE;	//画像を描画する
+			}
+		}
+
+		//背景画像が画面を通り越したとき
+		if (ImageTitleBack[num].image.x+ImageTitleBack[num].image.width < 0)
+		{
+			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅２つ分、左に移動させる
+			ImageTitleBack[num].IsDraw = FALSE;								//画像を描画しない
+		}
+	}
 
 	return;
 }
@@ -564,6 +596,25 @@ VOID MY_START_PROC(VOID)
 //スタート画面の描画
 VOID MY_START_DRAW(VOID)
 {
+	
+
+	//背景を描画する
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		//描画できるときは・・・
+		if (ImageTitleBack[num].IsDraw == TRUE)
+		{
+			//背景を描画
+			DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
+
+			//【デバッグ用】背景画像の数字をテスト的に表示
+			DrawFormatString(
+				ImageTitleBack[num].image.x,
+				ImageTitleBack[num].image.y,
+				GetColor(255, 0, 0), "背景画像：%d", num + 1);
+		}
+	}
+
 	DrawGraph(ImageTitleRogo.x, ImageTitleRogo.y, ImageTitleRogo.handle, TRUE);
 	return;
 }
@@ -665,6 +716,46 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleRogo.x = GAME_WIDTH / 2 - ImageTitleRogo.width / 2;		                //左右中央揃え
 	ImageTitleRogo.y = GAME_HEIGHT / 2 - ImageTitleRogo.height / 2;	                    //上下中央揃え
 
+	//タイトル背景
+	strcpy_s(ImageTitleBack[0].image.path, IMAGE_TITLE_BACK1_PATH);			//パスの設定
+	strcpy_s(ImageTitleBack[1].image.path, IMAGE_TITLE_BACK2_PATH);		//パスの設定(背景画像反転)
+	strcpy_s(ImageTitleBack[2].image.path, IMAGE_TITLE_BACK3_PATH);			//パスの設定
+	strcpy_s(ImageTitleBack[3].image.path, IMAGE_TITLE_BACK4_PATH);		//パスの設定(背景画像反転)
+
+	//画像を連続して読み込み
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		ImageTitleBack[num].image.handle = LoadGraph(ImageTitleBack[num].image.path);	//読み込み
+		if (ImageTitleBack[num].image.handle == -1)
+		{
+			//エラーメッセージ表示
+			MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BACK1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+			return FALSE;
+		}
+		//画像の幅と高さを取得
+		GetGraphSize(ImageTitleBack[num].image.handle, &ImageTitleBack[num].image.width, &ImageTitleBack[num].image.height);
+	}
+	//背景画像①の設定
+	ImageTitleBack[0].image.x = 0 - ImageTitleBack[0].image.width * 0;	//x原点
+	ImageTitleBack[0].image.y = GAME_HEIGHT / 2 - ImageTitleBack[0].image.height / 2; 				//上下中央揃え
+	ImageTitleBack[0].IsDraw = FALSE;
+
+	//背景画像②の設定
+	ImageTitleBack[1].image.x = ImageTitleBack[0].image.width * 1;	//画像の幅1つ分右に移動
+	ImageTitleBack[1].image.y = GAME_HEIGHT / 2 - ImageTitleBack[1].image.height / 2; 				//上下中央揃え
+	ImageTitleBack[1].IsDraw = FALSE;
+
+	//背景画像③の設定
+	ImageTitleBack[2].image.x = ImageTitleBack[0].image.width * 2;	//画像の幅2つ分右に移動
+	ImageTitleBack[2].image.y = GAME_HEIGHT / 2 - ImageTitleBack[2].image.height / 2; 				//上下中央揃え
+	ImageTitleBack[2].IsDraw = FALSE;
+
+	//背景画像③の設定
+	ImageTitleBack[3].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅3つ分右に移動
+	ImageTitleBack[3].image.y = GAME_HEIGHT / 2 - ImageTitleBack[3].image.height / 2; 				//上下中央揃え
+	ImageTitleBack[3].IsDraw = FALSE;
+
+
 	//エンド背景画像1
 	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		//パスの設定
 	ImageEndBack1.handle = LoadGraph(ImageEndBack1.path);	    //読み込み
@@ -684,6 +775,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		DeleteGraph(ImageTitleBack[0].image.handle);
+	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
 	return;
