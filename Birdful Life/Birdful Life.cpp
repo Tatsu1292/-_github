@@ -35,13 +35,15 @@
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
 
+#define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
+
+//背景スクロール
 #define IMAGE_TITLE_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //タイトル背景昼1
 #define IMAGE_TITLE_BACK2_PATH    TEXT(".\\IMAGE\\背景連続_補正あり2.png")           //タイトル背景昼2
 #define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_補正あり3.png")           //タイトル背景昼3
 #define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
 
-#define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
-
+#define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
 
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
