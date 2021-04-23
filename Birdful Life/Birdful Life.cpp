@@ -35,6 +35,14 @@
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
 
+#define IMAGE_TITLE_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //タイトル背景昼1
+#define IMAGE_TITLE_BACK2_PATH    TEXT(".\\IMAGE\\背景連続_補正あり2.png")           //タイトル背景昼2
+#define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_補正あり3.png")           //タイトル背景昼3
+#define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
+
+#define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
+
+
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
@@ -136,6 +144,7 @@ int GameScene;		//ゲームシーンを管理
 //プレイヤー関連
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
+IMAGE ImageTitleRogo;
 IMAGE ImageEndBack1;                //エンド背景ひなパターン
 
 //ひなセリフ関連
@@ -553,7 +562,7 @@ VOID MY_START_PROC(VOID)
 //スタート画面の描画
 VOID MY_START_DRAW(VOID)
 {
-
+	DrawGraph(ImageTitleRogo.x, ImageTitleRogo.y, ImageTitleRogo.handle, TRUE);
 	return;
 }
 
@@ -641,6 +650,19 @@ VOID MY_END_DRAW(VOID)
 //画像をまとめて読み込む関数
 BOOL MY_LOAD_IMAGE(VOID)
 {
+	//タイトルロゴ
+	strcpy_s(ImageTitleRogo.path, IMAGE_TITLE_ROGO_PATH);		//パスの設定
+	ImageTitleRogo.handle = LoadGraph(ImageTitleRogo.path);	    //読み込み
+	if (ImageTitleRogo.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_ROGO_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageTitleRogo.handle, &ImageTitleRogo.width, &ImageTitleRogo.height);	//画像の幅と高さを取得
+	ImageTitleRogo.x = GAME_WIDTH / 2 - ImageTitleRogo.width / 2;		                //左右中央揃え
+	ImageTitleRogo.y = GAME_HEIGHT / 2 - ImageTitleRogo.height / 2;	                    //上下中央揃え
+
 	//エンド背景画像1
 	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		//パスの設定
 	ImageEndBack1.handle = LoadGraph(ImageEndBack1.path);	    //読み込み
@@ -660,7 +682,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-	DeleteGraph(ImageEndBack1.handle);
+	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
+	DeleteGraph(ImageEndBack1.handle);//エンド背景1
 	return;
 }
 
