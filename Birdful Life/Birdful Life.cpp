@@ -47,6 +47,16 @@
 
 #define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
 
+#define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
+
+//背景スクロール
+#define IMAGE_TITLE_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //タイトル背景昼1
+#define IMAGE_TITLE_BACK2_PATH    TEXT(".\\IMAGE\\背景連続_補正あり2.png")           //タイトル背景昼2
+#define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_補正あり3.png")           //タイトル背景昼3
+#define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
+
+#define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
+
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
@@ -158,6 +168,9 @@ IMAGE ImageTitleRogo;
 IMAGE ImageEndBack1;                //エンド背景ひなパターン
 IMAGE ImageEndTbutton;              //エンドタイトルへボタン
 IMAGE ImageEndAbutton;              //エンドもう一回ボタン
+
+//背景関連
+IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
 
 //背景関連
 IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
@@ -808,18 +821,24 @@ BOOL MY_LOAD_IMAGE(VOID)
 VOID MY_DELETE_IMAGE(VOID)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	DeleteGraph(ImageEndBack1.handle);
 	DeleteGraph(ImageEndTbutton.handle);
 	DeleteGraph(ImageEndAbutton.handle);
 
 =======
+=======
+>>>>>>> master2
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
 		DeleteGraph(ImageTitleBack[0].image.handle);
 	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
+<<<<<<< HEAD
 >>>>>>> 73fb102c3c0fef4340c4b53be1b47994b1f1fb6a
+=======
+>>>>>>> master2
 	return;
 }
 
