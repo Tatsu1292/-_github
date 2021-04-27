@@ -34,6 +34,8 @@
 
 //‰æ‘œƒpƒX@¦–¼‘O‚Ì•t‚¯•û‚ÍŠî–{“I‚ÉIMAGE_ƒV[ƒ“–¼_‰½‚Ì‰æ‘œ‚©_PATH
 #define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_•â³‚ ‚è1.png")           //ƒGƒ“ƒh”wŒi‚Ğ‚Èƒpƒ^[ƒ“
+#define IMAGE_END_TBUTTON_PATH  TEXT(".\\IMAGE\\")           //ƒGƒ“ƒh@ƒ^ƒCƒgƒ‹‚Öƒ{ƒ^ƒ“
+#define IMAGE_END_ABUTTON_PATH  TEXT(".\\IMAGE\\")           //ƒGƒ“ƒh@‚à‚¤ˆê‰ñƒ{ƒ^ƒ“
 
 //ƒGƒ‰[ƒƒbƒZ[ƒW
 #define IMAGE_LOAD_ERR_TITLE	TEXT("‰æ‘œ“Ç‚İ‚İƒGƒ‰[")
@@ -137,12 +139,14 @@ int GameScene;		//ƒQ[ƒ€ƒV[ƒ“‚ğŠÇ—
 
 //‰æ‘œŠÖ˜A ¦–¼‘O‚Ì•t‚¯•û‚ÍImageƒV[ƒ“–¼‰½‚Ì‰æ‘œ‚©;
 IMAGE ImageEndBack1;                //ƒGƒ“ƒh”wŒi‚Ğ‚Èƒpƒ^[ƒ“
+IMAGE ImageEndTbutton;              //ƒGƒ“ƒhƒ^ƒCƒgƒ‹‚Öƒ{ƒ^ƒ“
+IMAGE ImageEndAbutton;              //ƒGƒ“ƒh‚à‚¤ˆê‰ñƒ{ƒ^ƒ“
 
 //‚Ğ‚ÈƒZƒŠƒtŠÖ˜A
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //•\¦‚µ‚½‚¢ƒƒbƒZ[ƒW
 char messageBuffer[MESSAGE_MAX_LINE][MESSAGE_MAX_LENGTH];   //ƒƒbƒZ[ƒW‚ğ•\¦‚·‚é‚½‚ß‚Ì‰¼‘zƒoƒbƒtƒ@
 static int currentCursor = 0;                               //‰½•¶š–Ú‚Ü‚Å•\¦‚µ‚Ä‚¢‚é‚©
-static int currentLineCursor = 0;                            //‰½s–Ú‚ğ•\¦‚µ‚Ä‚¢‚é‚©
+static int currentLineCursor = 0;                           //‰½s–Ú‚ğ•\¦‚µ‚Ä‚¢‚é‚©
 static int whiteColor;
 static int blackColor;
 static int messageBoxGraphHandle;
@@ -168,29 +172,29 @@ VOID MY_FONT_UNINSTALL_ONCE(VOID);	//ƒtƒHƒ“ƒg‚ğ‚±‚Ìƒ\ƒtƒg—p‚ÉAˆê“I‚ÉƒAƒ“ƒCƒ“ƒ
 BOOL MY_FONT_CREATE(VOID);			//ƒtƒHƒ“ƒg‚ğì¬‚·‚é
 VOID MY_FONT_DELETE(VOID);			//ƒtƒHƒ“ƒg‚ğíœ‚·‚é
 
-VOID MY_START(VOID);		//ƒXƒ^[ƒg‰æ–Ê
-VOID MY_START_PROC(VOID);	//ƒXƒ^[ƒg‰æ–Ê‚Ìˆ—
-VOID MY_START_DRAW(VOID);	//ƒXƒ^[ƒg‰æ–Ê‚Ì•`‰æ
+VOID MY_START(VOID);		        //ƒXƒ^[ƒg‰æ–Ê
+VOID MY_START_PROC(VOID);	        //ƒXƒ^[ƒg‰æ–Ê‚Ìˆ—
+VOID MY_START_DRAW(VOID);	        //ƒXƒ^[ƒg‰æ–Ê‚Ì•`‰æ
 
-VOID MY_PLAY_INIT(VOID);	//ƒvƒŒƒC‰æ–Ê‰Šú‰»
-VOID MY_PLAY(VOID);			//ƒvƒŒƒC‰æ–Ê
-VOID MY_PLAY_PROC(VOID);	//ƒvƒŒƒC‰æ–Ê‚Ìˆ—
-VOID MY_PLAY_DRAW(VOID);	//ƒvƒŒƒC‰æ–Ê‚Ì•`‰æ
+VOID MY_PLAY_INIT(VOID);	       //ƒvƒŒƒC‰æ–Ê‰Šú‰»
+VOID MY_PLAY(VOID);			       //ƒvƒŒƒC‰æ–Ê
+VOID MY_PLAY_PROC(VOID);	       //ƒvƒŒƒC‰æ–Ê‚Ìˆ—
+VOID MY_PLAY_DRAW(VOID);	       //ƒvƒŒƒC‰æ–Ê‚Ì•`‰æ
 
-VOID MY_END(VOID);			//ƒGƒ“ƒh‰æ–Ê
-VOID MY_END_PROC(VOID);		//ƒGƒ“ƒh‰æ–Ê‚Ìˆ—
-VOID MY_END_DRAW(VOID);		//ƒGƒ“ƒh‰æ–Ê‚Ì•`‰æ
+VOID MY_END(VOID);			       //ƒGƒ“ƒh‰æ–Ê
+VOID MY_END_PROC(VOID);		       //ƒGƒ“ƒh‰æ–Ê‚Ìˆ—
+VOID MY_END_DRAW(VOID);		       //ƒGƒ“ƒh‰æ–Ê‚Ì•`‰æ
 
-BOOL MY_LOAD_IMAGE(VOID);		//‰æ‘œ‚ğ‚Ü‚Æ‚ß‚Ä“Ç‚İ‚ŞŠÖ”
-VOID MY_DELETE_IMAGE(VOID);		//‰æ‘œ‚ğ‚Ü‚Æ‚ß‚Äíœ‚·‚éŠÖ”
+BOOL MY_LOAD_IMAGE(VOID);		   //‰æ‘œ‚ğ‚Ü‚Æ‚ß‚Ä“Ç‚İ‚ŞŠÖ”
+VOID MY_DELETE_IMAGE(VOID);		   //‰æ‘œ‚ğ‚Ü‚Æ‚ß‚Äíœ‚·‚éŠÖ”
 
-BOOL MY_LOAD_MUSIC(VOID);		//‰¹Šy‚ğ‚Ü‚Æ‚ß‚Ä“Ç‚İ‚ŞŠÖ”
-VOID MY_DELETE_MUSIC(VOID);		//‰¹Šy‚ğ‚Ü‚Æ‚ß‚Äíœ‚·‚éŠÖ”
+BOOL MY_LOAD_MUSIC(VOID);		   //‰¹Šy‚ğ‚Ü‚Æ‚ß‚Ä“Ç‚İ‚ŞŠÖ”
+VOID MY_DELETE_MUSIC(VOID);		   //‰¹Šy‚ğ‚Ü‚Æ‚ß‚Äíœ‚·‚éŠÖ”
 
 VOID writeSubstring(char* message, int start, int len,
-	int PosX, int PosY, int color, int bufferLine);
-VOID drawMessage(VOID);
-VOID setMessage(const char* ms);  //•`‰æ‚µ‚½‚¢ƒƒbƒZ[ƒW‚ğƒZƒbƒg
+	int PosX, int PosY, int color, int bufferLine);        //•¶š—ñ‚Ì‘‚«‚İ
+VOID drawMessage(VOID);                                    //•¶š—ñ‚Ì•`‰æ
+VOID setMessage(const char* ms);                           //•`‰æ‚µ‚½‚¢ƒƒbƒZ[ƒW‚ğƒZƒbƒg
 
 
 //########## ƒvƒƒOƒ‰ƒ€‚ÅÅ‰‚ÉÀs‚³‚ê‚éŠÖ” ##########
@@ -632,6 +636,8 @@ VOID MY_END_PROC(VOID)
 VOID MY_END_DRAW(VOID)
 {
 	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
+	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
+	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
 	
 	drawMessage();
 
@@ -642,7 +648,7 @@ VOID MY_END_DRAW(VOID)
 BOOL MY_LOAD_IMAGE(VOID)
 {
 	//ƒGƒ“ƒh”wŒi‰æ‘œ1
-	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		//ƒpƒX‚Ìİ’è
+	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		    //ƒpƒX‚Ìİ’è
 	ImageEndBack1.handle = LoadGraph(ImageEndBack1.path);	    //“Ç‚İ‚İ
 	if (ImageEndBack1.handle == -1)
 	{
@@ -651,9 +657,35 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndBack1.handle, &ImageEndBack1.width, &ImageEndBack1.height);	//‰æ‘œ‚Ì•‚Æ‚‚³‚ğæ“¾
-	ImageEndBack1.x = GAME_WIDTH / 2 - ImageEndBack1.width / 2;		                //¶‰E’†‰›‘µ‚¦
+	ImageEndBack1.x = GAME_WIDTH / 2 - ImageEndBack1.width / 2;		                    //¶‰E’†‰›‘µ‚¦
 	ImageEndBack1.y = GAME_HEIGHT / 2 - ImageEndBack1.height / 2;	                    //ã‰º’†‰›‘µ‚¦
 
+	//ƒGƒ“ƒhƒ^ƒCƒgƒ‹‚Ö‰æ‘œ
+	strcpy_s(ImageEndTbutton.path, IMAGE_END_TBUTTON_PATH);		    //ƒpƒX‚Ìİ’è
+	ImageEndTbutton.handle = LoadGraph(ImageEndTbutton.path);	    //“Ç‚İ‚İ
+	if (ImageEndTbutton.handle == -1)
+	{
+		//ƒGƒ‰[ƒƒbƒZ[ƒW•\¦
+		MessageBox(GetMainWindowHandle(), IMAGE_END_TBUTTON_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndTbutton.handle, &ImageEndTbutton.width, &ImageEndTbutton.height);	//‰æ‘œ‚Ì•‚Æ‚‚³‚ğæ“¾
+	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2;		                    //¶‰E’†‰›‘µ‚¦
+	ImageEndTbutton.y = GAME_HEIGHT / 2 - ImageEndTbutton.height / 2;	                    //ã‰º’†‰›‘µ‚¦
+
+	//ƒGƒ“ƒhƒ^ƒCƒgƒ‹‚Ö‰æ‘œ
+	strcpy_s(ImageEndAbutton.path, IMAGE_END_ABUTTON_PATH);		    //ƒpƒX‚Ìİ’è
+	ImageEndAbutton.handle = LoadGraph(ImageEndAbutton.path);	    //“Ç‚İ‚İ
+	if (ImageEndAbutton.handle == -1)
+	{
+		//ƒGƒ‰[ƒƒbƒZ[ƒW•\¦
+		MessageBox(GetMainWindowHandle(), IMAGE_END_ABUTTON_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndAbutton.handle, &ImageEndAbutton.width, &ImageEndAbutton.height);	//‰æ‘œ‚Ì•‚Æ‚‚³‚ğæ“¾
+	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2;		                    //¶‰E’†‰›‘µ‚¦
+	ImageEndAbutton.y = GAME_HEIGHT / 2 - ImageEndAbutton.height / 2;	                    //ã‰º’†‰›‘µ‚¦
+	
 	return TRUE;
 }
 
@@ -661,6 +693,9 @@ BOOL MY_LOAD_IMAGE(VOID)
 VOID MY_DELETE_IMAGE(VOID)
 {
 	DeleteGraph(ImageEndBack1.handle);
+	DeleteGraph(ImageEndTbutton.handle);
+	DeleteGraph(ImageEndAbutton.handle);
+
 	return;
 }
 
