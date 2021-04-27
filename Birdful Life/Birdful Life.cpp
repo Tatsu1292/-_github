@@ -820,25 +820,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 //画像をまとめて削除する関数
 VOID MY_DELETE_IMAGE(VOID)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
 	DeleteGraph(ImageEndBack1.handle);
 	DeleteGraph(ImageEndTbutton.handle);
 	DeleteGraph(ImageEndAbutton.handle);
 
-=======
-=======
->>>>>>> master2
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
 		DeleteGraph(ImageTitleBack[0].image.handle);
 	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
-<<<<<<< HEAD
->>>>>>> 73fb102c3c0fef4340c4b53be1b47994b1f1fb6a
-=======
->>>>>>> master2
+
 	return;
 }
 
