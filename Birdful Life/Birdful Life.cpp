@@ -34,8 +34,10 @@
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
-#define IMAGE_END_TBUTTON_PATH  TEXT(".\\IMAGE\\")           //エンド　タイトルへボタン
-#define IMAGE_END_ABUTTON_PATH  TEXT(".\\IMAGE\\")           //エンド　もう一回ボタン
+#define IMAGE_END_TBUTTON_PATH  TEXT(".\\IMAGE\\Easy_logo.png")           //エンド　タイトルへボタン
+#define IMAGE_END_ABUTTON_PATH  TEXT(".\\IMAGE\\Hard_logo.png")           //エンド　もう一回ボタン
+#define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\Easy_logo2.png")           //エンド　タイトルへボタン2
+#define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\Hard_logo2.png")           //エンド　もう一回ボタン2
 
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 
@@ -165,15 +167,14 @@ int GameScene;		//ゲームシーンを管理
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;
-IMAGE ImageEndBack1;                //エンド背景ひなパターン
 IMAGE ImageEndTbutton;              //エンドタイトルへボタン
 IMAGE ImageEndAbutton;              //エンドもう一回ボタン
+IMAGE ImageEndTbutton2;              //エンドタイトルへボタン2
+IMAGE ImageEndAbutton2;              //エンドもう一回ボタン2
 
 //背景関連
 IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
-
-//背景関連
-IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
+IMAGE ImageEndBack1;                                //エンド背景ひなパターン
 
 //ひなセリフ関連
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
@@ -649,7 +650,7 @@ VOID MY_PLAY(VOID)
 	MY_PLAY_PROC();	//プレイ画面の処理
 	MY_PLAY_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "プレイ画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "プレイ画面(Aを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
@@ -657,7 +658,7 @@ VOID MY_PLAY(VOID)
 VOID MY_PLAY_PROC(VOID)
 {
 	//スペースキーを押したら、エンドシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
 		//ゲームのシーンをエンド画面にする
 		GameScene = GAME_SCENE_END;
@@ -699,12 +700,27 @@ VOID MY_END_PROC(VOID)
 		setMessage("こんにちは");
 	}
 
+	if (ImageEndTbutton2.IsDraw == TRUE)
+	{
+		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+		{
+			GameScene = GAME_SCENE_START;
+			MY_PLAY_INIT();
+		}
+	}
+	if (ImageEndAbutton2.IsDraw == TRUE)
+	{
+		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+		{
+			GameScene = GAME_SCENE_PLAY;
+			MY_PLAY_INIT();
+		}
+	}
+	
 	
 
 	return;
 }
-
-	
 
 
 //エンド画面の描画
@@ -713,7 +729,30 @@ VOID MY_END_DRAW(VOID)
 	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
+	if (ImageEndTbutton2.IsDraw == TRUE)
+	{
+		DrawGraph(ImageEndTbutton2.x, ImageEndTbutton2.y, ImageEndTbutton2.handle, TRUE);
+	}
+	if (ImageEndAbutton2.IsDraw == TRUE)
+	{
+		DrawGraph(ImageEndAbutton2.x, ImageEndAbutton2.y, ImageEndAbutton2.handle, TRUE);
+	}
 	
+
+	if (MY_KEY_UP(KEY_INPUT_DOWN) == TRUE)
+	{
+		ImageEndAbutton2.IsDraw = TRUE;
+		ImageEndTbutton2.IsDraw = FALSE;
+	}
+	if (MY_KEY_UP(KEY_INPUT_UP) == TRUE)
+	{
+		ImageEndAbutton2.IsDraw = FALSE;
+		ImageEndTbutton2.IsDraw = TRUE;
+	}
+
+	/*DrawBox(50, 460, 550, 560, GetColor(255, 0, 0), TRUE);
+	DrawBox(50, 580, 550, 680, GetColor(255, 0, 0), TRUE);*/
+
 	drawMessage();
 
 	return;
@@ -798,10 +837,10 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndTbutton.handle, &ImageEndTbutton.width, &ImageEndTbutton.height);	//画像の幅と高さを取得
-	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2;		                    //左右中央揃え
-	ImageEndTbutton.y = GAME_HEIGHT / 2 - ImageEndTbutton.height / 2;	                    //上下中央揃え
+	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton.y = GAME_HEIGHT / 2 - ImageEndTbutton.height / 2 + 100;	                    //上下中央揃え
 
-	//エンドタイトルへ画像
+	//エンドもう一度画像
 	strcpy_s(ImageEndAbutton.path, IMAGE_END_ABUTTON_PATH);		    //パスの設定
 	ImageEndAbutton.handle = LoadGraph(ImageEndAbutton.path);	    //読み込み
 	if (ImageEndAbutton.handle == -1)
@@ -811,9 +850,37 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndAbutton.handle, &ImageEndAbutton.width, &ImageEndAbutton.height);	//画像の幅と高さを取得
-	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2;		                    //左右中央揃え
-	ImageEndAbutton.y = GAME_HEIGHT / 2 - ImageEndAbutton.height / 2;	                    //上下中央揃え
+	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton.y = GAME_HEIGHT / 2 - ImageEndAbutton.height / 2 + 220;	                    //上下中央揃え
 	
+	//エンドタイトルへ2画像
+	strcpy_s(ImageEndTbutton2.path, IMAGE_END_TBUTTON2_PATH);		    //パスの設定
+	ImageEndTbutton2.handle = LoadGraph(ImageEndTbutton2.path);	    //読み込み
+	if (ImageEndTbutton2.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_END_TBUTTON_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndTbutton2.handle, &ImageEndTbutton2.width, &ImageEndTbutton2.height);	//画像の幅と高さを取得
+	ImageEndTbutton2.x = GAME_WIDTH / 2 - ImageEndTbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton2.y = GAME_HEIGHT / 2 - ImageEndTbutton2.height / 2 + 100;	                    //上下中央揃え
+	ImageEndTbutton2.IsDraw = TRUE;
+
+	//エンドもう一度2画像
+	strcpy_s(ImageEndAbutton2.path, IMAGE_END_ABUTTON2_PATH);		    //パスの設定
+	ImageEndAbutton2.handle = LoadGraph(ImageEndAbutton2.path);	    //読み込み
+	if (ImageEndAbutton2.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_END_ABUTTON2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndAbutton2.handle, &ImageEndAbutton2.width, &ImageEndAbutton2.height);	//画像の幅と高さを取得
+	ImageEndAbutton2.x = GAME_WIDTH / 2 - ImageEndAbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton2.y = GAME_HEIGHT / 2 - ImageEndAbutton2.height / 2 + 220;	                    //上下中央揃え
+	ImageEndAbutton2.IsDraw = FALSE;
+
 	return TRUE;
 }
 
@@ -823,6 +890,8 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageEndBack1.handle);
 	DeleteGraph(ImageEndTbutton.handle);
 	DeleteGraph(ImageEndAbutton.handle);
+	DeleteGraph(ImageEndTbutton2.handle);
+	DeleteGraph(ImageEndAbutton2.handle);
 
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
