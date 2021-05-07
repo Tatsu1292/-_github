@@ -568,7 +568,7 @@ VOID MY_START(VOID)
 	MY_START_DRAW();	//スタート画面の描画
 
 
-	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -721,7 +721,7 @@ VOID MY_PLAY(VOID)
 	MY_PLAY_PROC();	//プレイ画面の処理
 	MY_PLAY_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "プレイ画面(Aを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "プレイ画面(Aを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -737,12 +737,53 @@ VOID MY_PLAY_PROC(VOID)
 		return;
 	}
 
+
+	//背景画像を動かす
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		//画像を移動させる
+		ImageTitleBack[num].image.x--;//右から左に流れる
+
+		//背景画像を描画できないとき
+		if (ImageTitleBack[num].IsDraw == FALSE)
+		{
+			//背景画像が画面内にいるとき
+			if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width > 0)
+			{
+				ImageTitleBack[num].IsDraw = TRUE;	//画像を描画する
+			}
+		}
+
+		//背景画像が画面を通り越したとき
+		if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width < 0)
+		{
+			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅２つ分、左に移動させる
+			ImageTitleBack[num].IsDraw = FALSE;								//画像を描画しない
+		}
+	}
+
 	return;
 }
 
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
+	//背景を描画する
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		//描画できるときは・・・
+		if (ImageTitleBack[num].IsDraw == TRUE)
+		{
+			//背景を描画
+			DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
+
+			//【デバッグ用】背景画像の数字をテスト的に表示
+			DrawFormatString(
+				ImageTitleBack[num].image.x,
+				ImageTitleBack[num].image.y,
+				GetColor(255, 0, 0), "背景画像：%d", num + 1);
+		}
+	}
 
 	return;
 }
