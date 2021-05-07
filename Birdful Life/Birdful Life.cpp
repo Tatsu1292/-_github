@@ -51,13 +51,6 @@
 
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 
-//背景スクロール
-#define IMAGE_TITLE_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //タイトル背景昼1
-#define IMAGE_TITLE_BACK2_PATH    TEXT(".\\IMAGE\\背景連続_補正あり2.png")           //タイトル背景昼2
-#define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_補正あり3.png")           //タイトル背景昼3
-#define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
-
-#define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
 
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
@@ -79,6 +72,7 @@
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
+	GAME_SCENE_RULE,
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END,
 };	//ゲームのシーン
@@ -210,6 +204,10 @@ VOID MY_START(VOID);		        //スタート画面
 VOID MY_START_PROC(VOID);	        //スタート画面の処理
 VOID MY_START_DRAW(VOID);	        //スタート画面の描画
 
+VOID MY_RULE(VOID);                //ルール説明画面
+VOID MY_RULE_PROC(VOID);           //ルール説明画面の処理
+VOID MY_RULE_DRAW(VOID);           //ルール説明画面の描画
+
 VOID MY_PLAY_INIT(VOID);	       //プレイ画面初期化
 VOID MY_PLAY(VOID);			       //プレイ画面
 VOID MY_PLAY_PROC(VOID);	       //プレイ画面の処理
@@ -285,6 +283,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 		case GAME_SCENE_START:
 			MY_START();	//スタート画面
+			break;
+		case GAME_SCENE_RULE:
+			MY_RULE();
 			break;
 		case GAME_SCENE_PLAY:
 			MY_PLAY();	//プレイ画面
@@ -580,7 +581,7 @@ VOID MY_START_PROC(VOID)
 		MY_PLAY_INIT();	//ゲーム初期化
 
 		//ゲームのシーンをプレイ画面にする
-		GameScene = GAME_SCENE_PLAY;
+		GameScene = GAME_SCENE_RULE;
 
 		return;
 	}
@@ -637,10 +638,80 @@ VOID MY_START_DRAW(VOID)
 	return;
 }
 
+VOID MY_RULE(VOID)
+{
+	MY_RULE_PROC();	//プレイ画面の処理
+	MY_RULE_DRAW();	//プレイ画面の描画
+
+	DrawString(0, 0, "ルール説明画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	return;
+}
+
+VOID MY_RULE_PROC(VOID)
+{
+	//スペースキーを押したら、プレイシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	{
+		MY_PLAY_INIT();	//ゲーム初期化
+
+		//ゲームのシーンをプレイ画面にする
+		GameScene = GAME_SCENE_PLAY;
+
+		return;
+	}
+	//背景画像を動かす
+	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	{
+		//画像を移動させる
+		ImageTitleBack[num].image.x--;//右から左に流れる
+
+		//背景画像を描画できないとき
+		if (ImageTitleBack[num].IsDraw == FALSE)
+		{
+			//背景画像が画面内にいるとき
+			if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width > 0)
+			{
+				ImageTitleBack[num].IsDraw = TRUE;	//画像を描画する
+			}
+		}
+
+		//背景画像が画面を通り越したとき
+		if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width < 0)
+		{
+			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅２つ分、左に移動させる
+			ImageTitleBack[num].IsDraw = FALSE;								//画像を描画しない
+		}
+	}
+	
+	return;
+}
+
+VOID MY_RULE_DRAW(VOID)
+{
+	// 背景を描画する
+		for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+		{
+			//描画できるときは・・・
+			if (ImageTitleBack[num].IsDraw == TRUE)
+			{
+				//背景を描画
+				DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
+
+				//【デバッグ用】背景画像の数字をテスト的に表示
+				DrawFormatString(
+					ImageTitleBack[num].image.x,
+					ImageTitleBack[num].image.y,
+					GetColor(255, 0, 0), "背景画像：%d", num + 1);
+			}
+		}
+	
+	return;
+}
+
 //プレイ画面初期化
 VOID MY_PLAY_INIT(VOID)
 {
-
+	
 	return;
 }
 
