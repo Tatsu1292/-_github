@@ -25,7 +25,7 @@
 #define NAME_MAX			255	//255文字まで
 
 //音量
-#define GAME_SOUND_VOLUME_PER	30	//%
+#define GAME_SOUND_VOLUME_PER	30	//音声全部の音量を30%程度にする
 #define GAME_SOUND_VOLUME	255*GAME_SOUND_VOLUME_PER/100	//↑の割合の音量
 
 //フォント
