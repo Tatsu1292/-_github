@@ -64,7 +64,7 @@
 
 
 //キャラクター
-#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\player1.png")	//プレイヤーの画像
+#define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 
 
 //エラーメッセージ
@@ -143,6 +143,12 @@ typedef struct STRUCT_CHARA
 {
 	IMAGE image;				//IMAGE構造体
 	int speed;					//速さ
+	int handle[2];
+	int x;
+	int y;
+	int width;
+	int height;
+	BOOL IsDraw;
 
 	RECT coll;					//当たり判定
 	iPOINT collBeforePt;		//当たる前の座標
@@ -174,6 +180,8 @@ int GameScene;		//ゲームシーンを管理
 
 //キャラクター関連
 CHARA player;
+
+int playercount;
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -608,8 +616,8 @@ VOID MY_START_PROC(VOID)
 	{
 
 		//プレイヤーの初期位置を設定
-		player.image.x = 100;
-		player.image.y = 650;
+		player.x = 100;
+		player.y = 400;
 
 
 		//BGM停止
@@ -776,22 +784,25 @@ VOID MY_PLAY(VOID)
 VOID MY_PLAY_PROC(VOID)
 {
 
+	playercount++; //プレイヤーアニメーション用のカウント
+
+
 	//プレイヤーの移動操作
 	player.speed = 5; //プレイヤーの速度を設定
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE) //SPACEを押していたら上昇
 	{
-		player.image.y -= player.speed;
+		playercount += 2;
+		player.y -= player.speed;
 	}
 	else //そうでなければ下降
 	{
-		player.image.y += player.speed;
+		playercount++;
+		player.y += player.speed;
 	}
 
 	//画面外にプレイヤーが行かないようにする
-	if (player.image.x < 0) { player.image.x = 0; }
-	if (player.image.x + player.image.width > GAME_WIDTH) { player.image.x = GAME_WIDTH - player.image.width; }
-	if (player.image.y < 0) { player.image.y = 0; }
-	if (player.image.y + player.image.height > GAME_HEIGHT) { player.image.y = GAME_HEIGHT - player.image.height; }
+	if (player.y < 0) { player.y = 0; }
+	if (player.y + player.height > GAME_HEIGHT) { player.y = GAME_HEIGHT - player.height; }
 
 
 	//Aキーを押したら、エンドシーンへ移動する
@@ -853,10 +864,24 @@ VOID MY_PLAY_DRAW(VOID)
 
 
 	//プレイヤーを描画
-	if (player.image.IsDraw == TRUE)
+
+	int a;
+
+	a = playercount % 15 / 5; 
+
+	if (a == 2)
 	{
-		DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
+		a = 0;
 	}
+
+	if (player.IsDraw == TRUE)
+	{
+		DrawGraph(player.x, player.y, player.handle[a], TRUE);
+	}
+
+
+
+
 
 	return;
 }
@@ -1079,17 +1104,16 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageEndAbutton2.IsDraw = FALSE;
 
 
-	//プレイヤーの画像
-	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);		//パスの設定
-	player.image.handle = LoadGraph(player.image.path);	//読み込み
-	if (player.image.handle == -1)
+	
+	//プレイヤーのアニメーション画像
+	LoadDivGraph(PLAYER_PATH, 2, 2, 1, 150, 150, player.handle);
+	for (int i = 0; i < 2; i++)
 	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
+		GetGraphSize(player.handle[i], &player.width, &player.height);
 	}
-	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	//画像の幅と高さを取得
-	player.image.IsDraw = TRUE;
+	player.IsDraw = TRUE;
+
+
 
 
 	return TRUE;
@@ -1111,7 +1135,10 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
 
-	DeleteGraph(player.image.handle);
+	for (int i = 0; i < 2; i++)
+	{
+		DeleteGraph(player.handle[i]);
+	}
 
 	return;
 }
