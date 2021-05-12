@@ -24,6 +24,10 @@
 #define PATH_MAX			255	//255文字まで
 #define NAME_MAX			255	//255文字まで
 
+//音量
+#define GAME_SOUND_VOLUME_PER	30	//%
+#define GAME_SOUND_VOLUME	255*GAME_SOUND_VOLUME_PER/100	//↑の割合の音量
+
 //フォント
 #define FONT_TANU_PATH			TEXT(".\\FONT\\TanukiMagic.ttf")	//フォントの場所
 #define FONT_TANU_NAME			TEXT("たぬき油性マジック")			//フォントの名前
@@ -31,6 +35,11 @@
 //エラーメッセージ
 #define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
+
+//音楽パス
+#define MUSIC_TITLE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	//タイトル画面BGM
+#define MUSIC_TITLE_SE_PATH TEXT(".\\MUSIC\\ヒヨコの鳴き声_編集済み.mp3")	//タイトル画面SE
+
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
@@ -158,6 +167,10 @@ MOUSE mouse;
 int GameScene;		//ゲームシーンを管理
 
 //プレイヤー関連
+
+//音楽関連
+MUSIC TitleBGM;	//タイトルBGM
+MUSIC TitleSE;	//タイトルSE
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;
@@ -575,9 +588,25 @@ VOID MY_START(VOID)
 //スタート画面の処理
 VOID MY_START_PROC(VOID)
 {
+	//BGM再生
+	if (CheckSoundMem(TitleBGM.handle) == 0)//まだBGMがなっていなかったら
+	{
+		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, TitleBGM.handle);
+		PlaySoundMem(TitleBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
+	}
+
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
+		//BGM停止
+		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
+		{
+			StopSoundMem(TitleBGM.handle); //止める
+		}
+
+		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, TitleSE.handle);//SEの音量調整
+		PlaySoundMem(TitleSE.handle, DX_PLAYTYPE_BACK);//SEを鳴らす
+
 		MY_PLAY_INIT();	//ゲーム初期化
 
 		//ゲームのシーンをプレイ画面にする
@@ -585,6 +614,8 @@ VOID MY_START_PROC(VOID)
 
 		return;
 	}
+
+
 	//背景画像を動かす
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
@@ -1018,6 +1049,23 @@ VOID MY_DELETE_IMAGE(VOID)
 //音楽をまとめて読み込む関数
 BOOL MY_LOAD_MUSIC(VOID)
 {
+	//スタートBGM
+	strcpy_s(TitleBGM.path, MUSIC_TITLE_BGM_PATH);
+	TitleBGM.handle = LoadSoundMem(TitleBGM.path);
+	if (TitleBGM.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_TITLE_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//スタートSE
+	strcpy_s(TitleSE.path, MUSIC_TITLE_SE_PATH);
+	TitleSE.handle = LoadSoundMem(TitleSE.path);
+	if (TitleSE.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_TITLE_SE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -1025,7 +1073,8 @@ BOOL MY_LOAD_MUSIC(VOID)
 //音楽をまとめて削除する関数
 VOID MY_DELETE_MUSIC(VOID)
 {
-
+	DeleteSoundMem(TitleBGM.handle);
+	DeleteSoundMem(TitleSE.handle);
 	return;
 }
 
