@@ -42,9 +42,10 @@
 
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
-#define IMAGE_END_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //エンド背景ひなパターン
-#define IMAGE_END_TBUTTON_PATH  TEXT(".\\IMAGE\\Easy_logo.png")           //エンド　タイトルへボタン
-#define IMAGE_END_ABUTTON_PATH  TEXT(".\\IMAGE\\Hard_logo.png")           //エンド　もう一回ボタン
+#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
+#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン
+#define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\Easy_logo.png")            //エンド　タイトルへボタン
+#define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\Hard_logo.png")            //エンド　もう一回ボタン
 #define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\Easy_logo2.png")           //エンド　タイトルへボタン2
 #define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\Hard_logo2.png")           //エンド　もう一回ボタン2
 
@@ -188,8 +189,9 @@ MUSIC TitleSE;	//タイトルSE
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;
-IMAGE ImageEndTbutton;              //エンドタイトルへボタン
-IMAGE ImageEndAbutton;              //エンドもう一回ボタン
+IMAGE ImageRuleEx;                   //ルール説明画像
+IMAGE ImageEndTbutton;               //エンドタイトルへボタン
+IMAGE ImageEndAbutton;               //エンドもう一回ボタン
 IMAGE ImageEndTbutton2;              //エンドタイトルへボタン2
 IMAGE ImageEndAbutton2;              //エンドもう一回ボタン2
 
@@ -694,7 +696,7 @@ VOID MY_RULE(VOID)
 	MY_RULE_PROC();	//プレイ画面の処理
 	MY_RULE_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "ルール説明画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "ルール説明画面(スペースキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -755,6 +757,8 @@ VOID MY_RULE_DRAW(VOID)
 					GetColor(255, 0, 0), "背景画像：%d", num + 1);
 			}
 		}
+
+		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
 	
 	return;
 }
@@ -1019,6 +1023,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleBack[3].image.y = GAME_HEIGHT / 2 - ImageTitleBack[3].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[3].IsDraw = FALSE;
 
+	//ルール説明画像
+	strcpy_s(ImageRuleEx.path, IMAGE_RULE_EX_PATH);		    //パスの設定
+	ImageRuleEx.handle = LoadGraph(ImageRuleEx.path);	    //読み込み
+	if (ImageRuleEx.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_RULE_EX_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageRuleEx.handle, &ImageRuleEx.width, &ImageRuleEx.height);	//画像の幅と高さを取得
+	ImageRuleEx.x = GAME_WIDTH / 2 - ImageRuleEx.width / 2;		                    //左右中央揃え
+	ImageRuleEx.y = GAME_HEIGHT / 2 - ImageRuleEx.height / 2;	                    //上下中央揃え
 
 	//エンド背景画像1
 	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		    //パスの設定
