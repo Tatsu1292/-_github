@@ -61,6 +61,11 @@
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 
 
+
+//キャラクター
+#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\player1.png")	//プレイヤーの画像
+
+
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
@@ -166,7 +171,8 @@ MOUSE mouse;
 //ゲーム関連
 int GameScene;		//ゲームシーンを管理
 
-//プレイヤー関連
+//キャラクター関連
+CHARA player;
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -598,6 +604,12 @@ VOID MY_START_PROC(VOID)
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
+
+		//プレイヤーの初期位置を設定
+		player.image.x = 100;
+		player.image.y = 650;
+
+
 		//BGM停止
 		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
 		{
@@ -759,7 +771,26 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
-	//スペースキーを押したら、エンドシーンへ移動する
+
+	//プレイヤーの移動操作
+	player.speed = 5; //プレイヤーの速度を設定
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE) //SPACEを押していたら上昇
+	{
+		player.image.y -= player.speed;
+	}
+	else //そうでなければ下降
+	{
+		player.image.y += player.speed;
+	}
+
+	//画面外にプレイヤーが行かないようにする
+	if (player.image.x < 0) { player.image.x = 0; }
+	if (player.image.x + player.image.width > GAME_WIDTH) { player.image.x = GAME_WIDTH - player.image.width; }
+	if (player.image.y < 0) { player.image.y = 0; }
+	if (player.image.y + player.image.height > GAME_HEIGHT) { player.image.y = GAME_HEIGHT - player.image.height; }
+
+
+	//Aキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
 		//ゲームのシーンをエンド画面にする
@@ -814,6 +845,13 @@ VOID MY_PLAY_DRAW(VOID)
 				ImageTitleBack[num].image.y,
 				GetColor(255, 0, 0), "背景画像：%d", num + 1);
 		}
+	}
+
+
+	//プレイヤーを描画
+	if (player.image.IsDraw == TRUE)
+	{
+		DrawGraph(player.image.x, player.image.y, player.image.handle, TRUE);
 	}
 
 	return;
@@ -1024,6 +1062,20 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageEndAbutton2.y = GAME_HEIGHT / 2 - ImageEndAbutton2.height / 2 + 220;	                    //上下中央揃え
 	ImageEndAbutton2.IsDraw = FALSE;
 
+
+	//プレイヤーの画像
+	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);		//パスの設定
+	player.image.handle = LoadGraph(player.image.path);	//読み込み
+	if (player.image.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_PLAYER_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);	//画像の幅と高さを取得
+	player.image.IsDraw = TRUE;
+
+
 	return TRUE;
 }
 
@@ -1042,6 +1094,8 @@ VOID MY_DELETE_IMAGE(VOID)
 	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
+
+	DeleteGraph(player.image.handle);
 
 	return;
 }
