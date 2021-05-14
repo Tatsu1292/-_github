@@ -187,10 +187,9 @@ int GameScene;		//ゲームシーンを管理
 
 //キャラクター関連
 CHARA player;
-
 int playercount;
-
-
+int life = 100;
+BOOL Ishit = TRUE;
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -271,6 +270,7 @@ VOID writeSubstring(char* message, int start, int len,
 VOID drawMessage(VOID);                                    //文字列の描画
 VOID setMessage(const char* ms);                           //描画したいメッセージをセット
 
+BOOL MY_CHECK_RECT_COLL(RECT, RECT);		//当たり判定関数
 
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -879,11 +879,34 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 
+	//エサを動かす
 	for (int i = 0; i < ESA_MAX; i++)
 	{
 		esa[i].x -= 2;
 	}
-	
+
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+
+		RECT PlayerRect;
+		PlayerRect.left = player.x;
+		PlayerRect.top = player.y;
+		PlayerRect.right = player.x + player.width;
+		PlayerRect.bottom = player.y + player.height;
+
+		RECT EsaRect;
+		EsaRect.left = esa[i].x;
+		EsaRect.top = esa[i].y;
+		EsaRect.right = esa[i].x + esa[i].width;
+		EsaRect.bottom = esa[i].y + esa[i].height;
+
+		if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
+		{
+			esa[i].IsDraw = FALSE;
+
+		}
+	}
+
 	return;
 }
 
@@ -907,7 +930,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-
+	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", life);
 
 	//エサを描画
 	for (int i = 0; i < ESA_MAX; i++)
@@ -916,6 +939,7 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(esa[i].x, esa[i].y, esa[i].handle, TRUE);
 		}
+		DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
 	}
 
 
@@ -937,7 +961,7 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 
-
+	DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
 
 
 	return;
@@ -1408,4 +1432,22 @@ VOID setMessage(const char* ms)  //描画したいメッセージをセット
 
 	strncpy(message, ms, MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE);   //メッセージをコピー
 	
+}
+
+
+//領域の当たり判定
+BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
+{
+
+	if (a.left < b.right &&
+		a.top < b.bottom &&
+		a.right > b.left &&
+		a.bottom > b.top)
+	{
+		if (Ishit == TRUE)
+		{
+			return TRUE;
+		}
+
+	}
 }
