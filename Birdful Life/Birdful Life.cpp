@@ -37,8 +37,10 @@
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
 
 //音楽パス
-#define MUSIC_TITLE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	//タイトル画面BGM
+#define MUSIC_TITLE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //タイトル画面BGM
 #define MUSIC_TITLE_SE_PATH TEXT(".\\MUSIC\\ヒヨコの鳴き声_編集済み.mp3")	//タイトル画面SE
+#define MUSIC_RULE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //ルール説明画面BGM
+#define MUSIC_END_BGM_PATH TEXT(".\\MUSIC\\ソライロビヨリ.mp3")	                //エンド画面BGM
 
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
@@ -186,6 +188,8 @@ int playercount;
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
 MUSIC TitleSE;	//タイトルSE
+MUSIC RuleBGM;	//ルール説明BGM
+MUSIC EndBGM;	//エンドBGM
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;
@@ -668,8 +672,6 @@ VOID MY_START_PROC(VOID)
 //スタート画面の描画
 VOID MY_START_DRAW(VOID)
 {
-	
-
 	//背景を描画する
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
@@ -696,15 +698,28 @@ VOID MY_RULE(VOID)
 	MY_RULE_PROC();	//プレイ画面の処理
 	MY_RULE_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "ルール説明画面(スペースキーを押して下さい)", GetColor(0, 0, 0));
+	DrawString(0, 0, "ルール説明画面(Sキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
 VOID MY_RULE_PROC(VOID)
 {
-	//スペースキーを押したら、プレイシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+	//BGM再生
+	if (CheckSoundMem(RuleBGM.handle) == 0)//まだBGMがなっていなかったら
 	{
+		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, RuleBGM.handle);
+		PlaySoundMem(RuleBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
+	}
+
+	//スペースキーを押したら、プレイシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
+	{
+		//BGM停止
+		if (CheckSoundMem(RuleBGM.handle) != 0)//BGMが流れていたら
+		{
+			StopSoundMem(RuleBGM.handle); //止める
+		}
+
 		MY_PLAY_INIT();	//ゲーム初期化
 
 		//ゲームのシーンをプレイ画面にする
@@ -899,6 +914,13 @@ VOID MY_END(VOID)
 //エンド画面の処理
 VOID MY_END_PROC(VOID)
 {
+	//BGM再生
+	if (CheckSoundMem(EndBGM.handle) == 0)//まだBGMがなっていなかったら
+	{
+		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, EndBGM.handle);
+		PlaySoundMem(EndBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
+	}
+
 	//エスケープキーを押したら、スタートシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
@@ -914,16 +936,28 @@ VOID MY_END_PROC(VOID)
 	{
 		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 		{
-			GameScene = GAME_SCENE_START;
+			//BGM停止
+			if (CheckSoundMem(EndBGM.handle) != 0)//BGMが流れていたら
+			{
+				StopSoundMem(EndBGM.handle); //止める
+			}
+
 			MY_PLAY_INIT();
+			GameScene = GAME_SCENE_START;
 		}
 	}
 	if (ImageEndAbutton2.IsDraw == TRUE)
 	{
 		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 		{
-			GameScene = GAME_SCENE_PLAY;
+			//BGM停止
+			if (CheckSoundMem(EndBGM.handle) != 0)//BGMが流れていたら
+			{
+				StopSoundMem(EndBGM.handle); //止める
+			}
+
 			MY_PLAY_INIT();
+			GameScene = GAME_SCENE_RULE;
 		}
 	}
 	
@@ -1164,6 +1198,24 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
+	//ルール説明BGM
+	strcpy_s(RuleBGM.path, MUSIC_RULE_BGM_PATH);
+	RuleBGM.handle = LoadSoundMem(RuleBGM.path);
+	if (RuleBGM.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_RULE_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//エンドBGM
+	strcpy_s(EndBGM.path, MUSIC_END_BGM_PATH);
+	EndBGM.handle = LoadSoundMem(EndBGM.path);
+	if (EndBGM.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_END_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
 	return TRUE;
 }
 
@@ -1172,6 +1224,9 @@ VOID MY_DELETE_MUSIC(VOID)
 {
 	DeleteSoundMem(TitleBGM.handle);
 	DeleteSoundMem(TitleSE.handle);
+	DeleteSoundMem(RuleBGM.handle);
+	DeleteSoundMem(EndBGM.handle);
+
 	return;
 }
 
