@@ -69,6 +69,11 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 
 
+//アイテム
+#define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
+#define ESA_MAX 10		//エサの最大出現数
+
+
 //エラーメッセージ
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
@@ -184,6 +189,11 @@ int GameScene;		//ゲームシーンを管理
 CHARA player;
 
 int playercount;
+
+
+
+//アイテム関連
+IMAGE esa[ESA_MAX];
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -624,6 +634,20 @@ VOID MY_START_PROC(VOID)
 		player.y = 400;
 
 
+		//エサの初期位置
+		for (int i = 0; i < ESA_MAX; i++)
+		{
+			esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
+
+			esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
+
+			//エサのY位置をランダムにする
+			int ichi = GetRand(GAME_HEIGHT - esa[i].height);
+			
+			esa[i].y = ichi;
+		}
+
+
 		//BGM停止
 		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
 		{
@@ -854,6 +878,12 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
+
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		esa[i].x -= 2;
+	}
+	
 	return;
 }
 
@@ -876,6 +906,18 @@ VOID MY_PLAY_DRAW(VOID)
 				GetColor(255, 0, 0), "背景画像：%d", num + 1);
 		}
 	}
+
+
+
+	//エサを描画
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		if (esa[i].IsDraw == TRUE)
+		{
+			DrawGraph(esa[i].x, esa[i].y, esa[i].handle, TRUE);
+		}
+	}
+
 
 
 	//プレイヤーを描画
@@ -1149,6 +1191,19 @@ BOOL MY_LOAD_IMAGE(VOID)
 
 
 
+	//エサ
+	strcpy_s(esa[0].path, IMAGE_ESA_PATH);
+	esa[0].handle = LoadGraph(esa[0].path);
+	if (esa[0].handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_ESA_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(esa[0].handle, &esa[0].width, &esa[0].height);
+	esa[0].IsDraw = TRUE;
+
+
+
 
 	return TRUE;
 }
@@ -1172,6 +1227,11 @@ VOID MY_DELETE_IMAGE(VOID)
 	for (int i = 0; i < 2; i++)
 	{
 		DeleteGraph(player.handle[i]);
+	}
+
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		DeleteGraph(esa[0].handle);
 	}
 
 	return;
