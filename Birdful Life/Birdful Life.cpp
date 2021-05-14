@@ -52,6 +52,7 @@
 #define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\Hard_logo2.png")           //エンド　もう一回ボタン2
 
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
+#define IMAGE_TITLE_PUSH_PATH	 TEXT(".\\IMAGE\\PushEnterToStart.png")	//エンターキーでスタートのロゴ
 
 //背景スクロール
 #define IMAGE_TITLE_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_補正あり1.png")           //タイトル背景昼1
@@ -60,8 +61,6 @@
 #define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
 
 #define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
-
-#define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 
 
 
@@ -201,7 +200,9 @@ MUSIC RuleBGM;	//ルール説明BGM
 MUSIC EndBGM;	//エンドBGM
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
-IMAGE ImageTitleRogo;
+IMAGE ImageTitleRogo;				 //タイトルロゴ
+IMAGE ImageTitlePush;				 //PUSH_TO_ENTERロゴ
+
 IMAGE ImageRuleEx;                   //ルール説明画像
 IMAGE ImageEndTbutton;               //エンドタイトルへボタン
 IMAGE ImageEndAbutton;               //エンドもう一回ボタン
@@ -611,7 +612,7 @@ VOID MY_START(VOID)
 	MY_START_DRAW();	//スタート画面の描画
 
 
-	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(0, 0, 0));
+	//DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -714,6 +715,7 @@ VOID MY_START_DRAW(VOID)
 	}
 
 	DrawGraph(ImageTitleRogo.x, ImageTitleRogo.y, ImageTitleRogo.handle, TRUE);
+	DrawGraph(ImageTitlePush.x, ImageTitlePush.y, ImageTitlePush.handle, TRUE);
 	return;
 }
 
@@ -1084,6 +1086,19 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleRogo.x = GAME_WIDTH / 2 - ImageTitleRogo.width / 2;		                //左右中央揃え
 	ImageTitleRogo.y = GAME_HEIGHT / 2 - ImageTitleRogo.height / 2;	                    //上下中央揃え
 
+	//PUSH_TO_ENTERロゴ
+	strcpy_s(ImageTitlePush.path, IMAGE_TITLE_PUSH_PATH);		//パスの設定
+	ImageTitlePush.handle = LoadGraph(ImageTitlePush.path);	    //読み込み
+	if (ImageTitlePush.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_PUSH_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageTitlePush.handle, &ImageTitlePush.width, &ImageTitlePush.height);	//画像の幅と高さを取得
+	ImageTitlePush.x = GAME_WIDTH / 2 - ImageTitlePush.width / 2;		                //左右中央揃え
+	ImageTitlePush.y = GAME_HEIGHT / 4 * 3;	                    //縦3/4位の位置
+
 	//タイトル背景
 	strcpy_s(ImageTitleBack[0].image.path, IMAGE_TITLE_BACK1_PATH);			//パスの設定
 	strcpy_s(ImageTitleBack[1].image.path, IMAGE_TITLE_BACK2_PATH);		//パスの設定(背景画像反転)
@@ -1246,6 +1261,7 @@ VOID MY_DELETE_IMAGE(VOID)
 		DeleteGraph(ImageTitleBack[0].image.handle);
 	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
+	DeleteGraph(ImageTitlePush.handle);//PUSU_TO_ENTERロゴ
 	DeleteGraph(ImageEndBack1.handle);//エンド背景1
 
 	for (int i = 0; i < 2; i++)
