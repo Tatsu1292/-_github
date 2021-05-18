@@ -832,12 +832,11 @@ VOID MY_PLAY_PROC(VOID)
 	player.speed = 5; //プレイヤーの速度を設定
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE) //SPACEを押していたら上昇
 	{
-		playercount += 2;
+		playercount += 1;
 		player.y -= player.speed;
 	}
 	else //そうでなければ下降
 	{
-		playercount++;
 		player.y += player.speed;
 	}
 
