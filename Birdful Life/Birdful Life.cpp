@@ -192,6 +192,7 @@ BOOL Ishit = TRUE;
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
+int score = 0;
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -883,7 +884,10 @@ VOID MY_PLAY_PROC(VOID)
 	//エサを動かす
 	for (int i = 0; i < ESA_MAX; i++)
 	{
-		esa[i].x -= 2;
+		if (esa[i].x > 0 - esa[i].width)
+		{
+			esa[i].x -= 4;
+		}
 	}
 
 	for (int i = 0; i < ESA_MAX; i++)
@@ -904,7 +908,8 @@ VOID MY_PLAY_PROC(VOID)
 		if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 		{
 			esa[i].IsDraw = FALSE;
-
+			esa[i].x = -100;
+			score += 50;
 		}
 	}
 
@@ -932,6 +937,7 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", life);
+	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
 
 	//エサを描画
 	for (int i = 0; i < ESA_MAX; i++)
@@ -942,6 +948,8 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 		DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
 	}
+
+
 
 
 
