@@ -807,7 +807,9 @@ VOID MY_RULE_DRAW(VOID)
 //プレイ画面初期化
 VOID MY_PLAY_INIT(VOID)
 {
-	
+	//スコアの初期化
+	//ライフの初期化
+
 	return;
 }
 
@@ -999,6 +1001,7 @@ VOID MY_END_PROC(VOID)
 		setMessage("こんにちは");
 	}
 
+	//タイトルへ戻るボタン
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
 		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
@@ -1013,6 +1016,7 @@ VOID MY_END_PROC(VOID)
 			GameScene = GAME_SCENE_START;
 		}
 	}
+	//もう一度プレイボタン
 	if (ImageEndAbutton2.IsDraw == TRUE)
 	{
 		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
@@ -1040,21 +1044,24 @@ VOID MY_END_DRAW(VOID)
 	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
+	//タイトルへボタンを光らせる
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
 		DrawGraph(ImageEndTbutton2.x, ImageEndTbutton2.y, ImageEndTbutton2.handle, TRUE);
 	}
+	//もう一度プレイへボタンを光らせる
 	if (ImageEndAbutton2.IsDraw == TRUE)
 	{
 		DrawGraph(ImageEndAbutton2.x, ImageEndAbutton2.y, ImageEndAbutton2.handle, TRUE);
 	}
 	
-
+	//下キーを押すと
 	if (MY_KEY_UP(KEY_INPUT_DOWN) == TRUE)
 	{
 		ImageEndAbutton2.IsDraw = TRUE;
 		ImageEndTbutton2.IsDraw = FALSE;
 	}
+	//上キーを押すと
 	if (MY_KEY_UP(KEY_INPUT_UP) == TRUE)
 	{
 		ImageEndAbutton2.IsDraw = FALSE;
