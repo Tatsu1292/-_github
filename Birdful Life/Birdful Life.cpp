@@ -66,9 +66,9 @@
 
 //ƒLƒƒƒ‰ƒNƒ^[
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//ƒvƒŒƒCƒ„[‚Ì‰æ‘œ
-#define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\ƒJƒ‰ƒXƒm[ƒ}ƒ‹.png")
-#define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\ƒJƒ‰ƒXƒm[ƒ}ƒ‹2.png")
-#define ENEMY_NUM				50
+#define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\ƒJƒ‰ƒXƒm[ƒ}ƒ‹.png")	//“GiƒJƒ‰ƒX‚Ì‰æ‘œj
+#define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\ƒJƒ‰ƒXƒm[ƒ}ƒ‹2.png")	//“GiÂƒJƒ‰ƒX‚Ì‰æ‘œj
+#define ENEMY_NUM				50    //@“G‚Ì‚l‚`‚w’l
 
 
 //ƒAƒCƒeƒ€
@@ -163,7 +163,10 @@ typedef struct STRUCT_CHARA
 	RECT coll;					//“–‚½‚è”»’è
 	iPOINT collBeforePt;		//“–‚½‚é‘O‚ÌÀ•W
 
-	//“Gê—pŠÖ”
+	//ƒvƒŒƒCƒ„[ê—p
+	int life = 100;		//ƒvƒŒƒCƒ„[‚Ìƒ‰ƒCƒt
+
+	//ƒGƒlƒ~[ê—p
 	BOOL IsCreate = FALSE;	//¶¬‚µ‚½‚©H
 
 }CHARA;	//ƒLƒƒƒ‰ƒNƒ^[\‘¢‘Ì
@@ -192,17 +195,17 @@ MOUSE mouse;
 int GameScene;		//ƒQ[ƒ€ƒV[ƒ“‚ğŠÇ—
 
 //ƒLƒƒƒ‰ƒNƒ^[ŠÖ˜A
-CHARA player;
+CHARA player; 
 CHARA enemy[ENEMY_NUM];
 CHARA karasu1;
 CHARA karasu2;
 
-int playercount;
-int mutekicount;
-int tennmetu;
-int life = 100;
-BOOL Ishit = TRUE;
-BOOL IsMuteki = FALSE;
+int playercount; //ƒvƒŒƒCƒ„[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“—pƒJƒEƒ“ƒg
+int mutekicount;	//–³“GŠÔ‚ğ‘ª‚éƒJƒEƒ“ƒg
+int tennmetu;		//“_–ÅŠÔ‚ğ‘ª‚éƒJƒEƒ“ƒg
+
+BOOL Ishit = TRUE;		//“–‚½‚è”»’è‚ª‚Â‚­‚©
+BOOL IsMuteki = FALSE;	//–³“Gó‘Ô‚É‚È‚Á‚Ä‚¢‚é‚©
 
 int TekiCreateCnt = 0;					//“G‚ğì‚éŠÔŠu
 int TekiCreateCntMax = GAME_FPS * 5;	//“G‚ğì‚éŠÔŠu(MAX)
@@ -291,8 +294,8 @@ VOID setMessage(const char* ms);                           //•`‰æ‚µ‚½‚¢ƒƒbƒZ[ƒ
 
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);		//“–‚½‚è”»’èŠÖ”
 
-//“–‚½‚è”»’è
-VOID EnemyAtari(CHARA* e);
+//“–‚½‚è”»’èŠÖ”
+VOID EnemyAtari(CHARA* e);	//“G
 
 //########## ƒvƒƒOƒ‰ƒ€‚ÅÅ‰‚ÉÀs‚³‚ê‚éŠÖ” ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -873,9 +876,9 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH + index * (+100);
-					enemy[index].image.y = GetRand(GAME_HEIGHT - enemy[index].image.height);
-					enemy[index].image.IsDraw = TRUE;
+					enemy[index].image.x = GAME_WIDTH + index * (+100);	
+					enemy[index].image.y = GetRand(GAME_HEIGHT - enemy[index].image.height);	//“G‚ÌoŒ»YˆÊ’u‚ğƒ‰ƒ“ƒ_ƒ€
+					enemy[index].image.IsDraw = TRUE;	
 					EnemyAtari(&enemy[index]);
 
 					enemy[index].IsCreate = TRUE;
@@ -973,10 +976,6 @@ VOID MY_PLAY_PROC(VOID)
 			}
 		}
 
-
-		
-
-
 		//ƒvƒŒƒC‰æ–Ê‚Å‚Ì“G‚Ì\‘¢
 		for (int i = 0; i < ENEMY_NUM; i++)
 		{
@@ -988,9 +987,9 @@ VOID MY_PLAY_PROC(VOID)
 			{
 				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
 				{
-					life -= 1;
+					player.life -= 1;	//ƒ‰ƒCƒt‚ğŒ¸‚ç‚·
 					/*mutekicount = 0;*/
-					IsMuteki = TRUE;
+					IsMuteki = TRUE;	//ˆê’èŠÔA–³“Gó‘Ô‚É‚È‚é
 
 					enemy[i].IsCreate = FALSE;
 
@@ -998,10 +997,6 @@ VOID MY_PLAY_PROC(VOID)
 			}
 		}
 	
-
-
-	
-
 
 	//–³“GŠÔ
 	if (IsMuteki == TRUE)
@@ -1064,7 +1059,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", life);
+	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
 
 	//ƒGƒT‚ğ•`‰æ
@@ -1387,7 +1382,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.IsDraw = TRUE;
 
 
-
+	//ƒJƒ‰ƒX‚P
 	strcpy_s(karasu1.image.path, IMAGE_ENEMY_PATH);
 	karasu1.image.handle = LoadGraph(karasu1.image.path);
 	if (karasu1.image.handle == -1)
@@ -1401,7 +1396,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	karasu1.speed = 4;
 
 
-
+	//ƒJƒ‰ƒX‚Q
 	strcpy_s(karasu2.image.path, IMAGE_ENEMY2_PATH);
 	karasu2.image.handle = LoadGraph(karasu2.image.path);
 	if (karasu2.image.handle == -1)
