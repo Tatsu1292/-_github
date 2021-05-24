@@ -68,6 +68,9 @@
 
 //キャラクター
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
+#define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
+#define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
+#define ENEMY_NUM				50    //　敵のＭＡＸ値
 
 
 //アイテム
@@ -157,9 +160,16 @@ typedef struct STRUCT_CHARA
 	int width;
 	int height;
 	BOOL IsDraw;
+	RECT rect;
 
 	RECT coll;					//当たり判定
 	iPOINT collBeforePt;		//当たる前の座標
+
+	//プレイヤー専用
+	int life = 100;		//プレイヤーのライフ
+
+	//エネミー専用
+	BOOL IsCreate = FALSE;	//生成したか？
 
 }CHARA;	//キャラクター構造体
 
@@ -187,10 +197,20 @@ MOUSE mouse;
 int GameScene;		//ゲームシーンを管理
 
 //キャラクター関連
-CHARA player;
-int playercount;
-int life = 100;
-BOOL Ishit = TRUE;
+CHARA player; 
+CHARA enemy[ENEMY_NUM];
+CHARA karasu1;
+CHARA karasu2;
+
+int playercount; //プレイヤーのアニメーション用カウント
+int mutekicount;	//無敵時間を測るカウント
+int tennmetu;		//点滅時間を測るカウント
+
+BOOL Ishit = TRUE;		//当たり判定がつくか
+BOOL IsMuteki = FALSE;	//無敵状態になっているか
+
+int TekiCreateCnt = 0;					//敵を作る間隔
+int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -277,6 +297,9 @@ VOID drawMessage(VOID);                                    //文字列の描画
 VOID setMessage(const char* ms);                           //描画したいメッセージをセット
 
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);		//当たり判定関数
+
+//当たり判定関数
+VOID EnemyAtari(CHARA* e);	//敵
 
 //########## プログラムで最初に実行される関数 ##########
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -832,6 +855,43 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
+	if (TekiCreateCnt < TekiCreateCntMax) { TekiCreateCnt++; }
+	else
+	{
+		TekiCreateCnt = 0;	//カウンタ初期化
+
+		//敵を生成するか決める
+		for (int index = 0; index < ENEMY_NUM; index++)
+		{
+			//敵がまだ生成されていないとき
+			if (enemy[index].IsCreate == FALSE)
+			{
+				//ランダムで0~3が出れば敵生成
+				int kind = GetRand(100);
+				if (3 >= kind)
+				{
+					switch (kind)
+					{
+					case 0:
+						enemy[index] = karasu1;
+						break;
+					case 1:
+						enemy[index] = karasu2;
+					default:
+						break;
+					}
+
+					enemy[index].image.x = GAME_WIDTH + index * (+100);	
+					enemy[index].image.y = GetRand(GAME_HEIGHT - enemy[index].image.height);	//敵の出現Y位置をランダム
+					enemy[index].image.IsDraw = TRUE;	
+					EnemyAtari(&enemy[index]);
+
+					enemy[index].IsCreate = TRUE;
+				}
+			}
+		}
+
+	}
 
 	playercount++; //プレイヤーアニメーション用のカウント
 
@@ -897,8 +957,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
-	for (int i = 0; i < ESA_MAX; i++)
-	{
+	
 
 		RECT PlayerRect;
 		PlayerRect.left = player.x;
@@ -906,18 +965,80 @@ VOID MY_PLAY_PROC(VOID)
 		PlayerRect.right = player.x + player.width;
 		PlayerRect.bottom = player.y + player.height;
 
-		RECT EsaRect;
-		EsaRect.left = esa[i].x;
-		EsaRect.top = esa[i].y;
-		EsaRect.right = esa[i].x + esa[i].width;
-		EsaRect.bottom = esa[i].y + esa[i].height;
-
-		if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
+		for (int i = 0; i < ESA_MAX; i++)
 		{
-			esa[i].IsDraw = FALSE;
-			esa[i].x = -100;
-			score += 50;
+			RECT EsaRect;
+			EsaRect.left = esa[i].x;
+			EsaRect.top = esa[i].y;
+			EsaRect.right = esa[i].x + esa[i].width;
+			EsaRect.bottom = esa[i].y + esa[i].height;
+
+			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
+			{
+				esa[i].IsDraw = FALSE;
+				esa[i].x = -100;
+				score += 50;
+			}
 		}
+
+		//プレイ画面での敵の構造
+		for (int i = 0; i < ENEMY_NUM; i++)
+		{
+			enemy[i].image.x -= enemy[i].speed;
+
+			EnemyAtari(&enemy[i]);
+
+			if (enemy[i].image.IsDraw == TRUE)
+			{
+				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
+				{
+					player.life -= 1;	//ライフを減らす
+					/*mutekicount = 0;*/
+					IsMuteki = TRUE;	//一定時間、無敵状態になる
+
+					enemy[i].IsCreate = FALSE;
+
+				}
+			}
+		}
+	
+
+	//無敵時間
+	if (IsMuteki == TRUE)
+	{
+		mutekicount++;		//無敵時間を数えるカウントを増やす。
+
+		if (mutekicount >= 100)
+		{
+			Ishit = TRUE;
+			IsMuteki = FALSE;
+			player.IsDraw = TRUE;
+			mutekicount = 0;
+		}
+		else if (mutekicount <= 100)
+		{
+			Ishit = FALSE;	//当たり判定関数オフ
+
+			if (tennmetu < 5) //点滅の時間間隔を設定
+			{
+				tennmetu += 1;
+			}
+			else
+			{
+				if (player.IsDraw == TRUE)
+				{
+					player.IsDraw = FALSE;
+				}
+				else if (player.IsDraw == FALSE)
+				{
+					player.IsDraw = TRUE;
+				}
+
+				tennmetu = 0;
+			}
+
+		}
+
 	}
 
 	return;
@@ -943,7 +1064,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", life);
+	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
 
 	//エサを描画
@@ -957,7 +1078,25 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 
+	//敵の描画
+	for (int i = 0; i < ENEMY_NUM; i++)
+	{
+		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
 
+		if (enemy[i].image.x <= 0)
+		{
+			enemy[i].image.IsDraw = FALSE;
+		}
+		else if (enemy[i].image.x <= GAME_WIDTH)
+		{
+			enemy[i].image.IsDraw = TRUE;
+		}
+
+		if (enemy[i].image.IsDraw == TRUE)
+		{
+			DrawGraph(enemy[i].image.x, enemy[i].image.y, enemy[i].image.handle, TRUE);
+		}
+	}
 
 
 	//プレイヤーを描画
@@ -1283,6 +1422,33 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.IsDraw = TRUE;
 
 
+	//カラス１
+	strcpy_s(karasu1.image.path, IMAGE_ENEMY_PATH);
+	karasu1.image.handle = LoadGraph(karasu1.image.path);
+	if (karasu1.image.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_ENEMY_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(karasu1.image.handle, &karasu1.image.width, &karasu1.image.height);
+	karasu1.image.x = GAME_WIDTH + 0 * (+100);
+	karasu1.image.y = 100;
+	karasu1.speed = 4;
+
+
+	//カラス２
+	strcpy_s(karasu2.image.path, IMAGE_ENEMY2_PATH);
+	karasu2.image.handle = LoadGraph(karasu2.image.path);
+	if (karasu2.image.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_ENEMY2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(karasu2.image.handle, &karasu2.image.width, &karasu2.image.height);
+	karasu2.image.x = GAME_WIDTH + 1 * (+100);
+	karasu2.image.y = 500;
+	karasu2.speed = 6;
+
 
 	//エサ
 	strcpy_s(esa[0].path, IMAGE_ESA_PATH);
@@ -1505,6 +1671,30 @@ VOID setMessage(const char* ms)  //描画したいメッセージをセット
 }
 
 
+//敵の当たり関数
+
+VOID EnemyAtari(CHARA* e)
+{
+	e->rect.left = e->image.x;
+	e->rect.top = e->image.y;
+	e->rect.right = e->image.x + e->image.width;
+	e->rect.bottom = e->image.y + e->image.height;
+
+	return;
+}
+
+int ENEMY_CHECK()
+{
+	for (int i = 0; i < ENEMY_NUM; i++)
+	{
+		if (enemy[i].image.IsDraw == FALSE) //敵の画像がなかったら当たり判定がなくなる
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 //領域の当たり判定
 BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 {
@@ -1520,4 +1710,5 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 		}
 
 	}
+	return FALSE;
 }
