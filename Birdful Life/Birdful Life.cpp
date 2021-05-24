@@ -45,7 +45,9 @@
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
-#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン
+#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン1
+#define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン2
+#define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
 #define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\Easy_logo.png")            //エンド　タイトルへボタン
 #define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\Hard_logo.png")            //エンド　もう一回ボタン
 #define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\Easy_logo2.png")           //エンド　タイトルへボタン2
@@ -212,7 +214,9 @@ IMAGE ImageEndAbutton2;              //エンドもう一回ボタン2
 
 //背景関連
 IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
-IMAGE ImageEndBack1;                                //エンド背景ひなパターン
+IMAGE ImageEndBack1;                                //エンド背景ひなパターン1
+IMAGE ImageEndBack2;                                //エンド背景ひなパターン2
+IMAGE ImageEndBack3;                                //エンド背景ひなパターン3
 
 //ひなセリフ関連
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
@@ -809,6 +813,7 @@ VOID MY_RULE_DRAW(VOID)
 VOID MY_PLAY_INIT(VOID)
 {
 	//スコアの初期化
+	score = 0;
 	//ライフの初期化
 
 	return;
@@ -1004,11 +1009,6 @@ VOID MY_END_PROC(VOID)
 		GameScene = GAME_SCENE_START;
 	}
 
-	if (MY_MOUSE_DOWN(MOUSE_INPUT_LEFT) == TRUE)
-	{
-		setMessage("こんにちは");
-	}
-
 	//タイトルへ戻るボタン
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
@@ -1040,7 +1040,18 @@ VOID MY_END_PROC(VOID)
 		}
 	}
 	
-	
+	//下キーを押すと
+	if (MY_KEY_UP(KEY_INPUT_DOWN) == TRUE)
+	{
+		ImageEndAbutton2.IsDraw = TRUE;
+		ImageEndTbutton2.IsDraw = FALSE;
+	}
+	//上キーを押すと
+	if (MY_KEY_UP(KEY_INPUT_UP) == TRUE)
+	{
+		ImageEndAbutton2.IsDraw = FALSE;
+		ImageEndTbutton2.IsDraw = TRUE;
+	}
 
 	return;
 }
@@ -1049,7 +1060,22 @@ VOID MY_END_PROC(VOID)
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
-	DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
+	if (score < 100)
+	{
+		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
+		setMessage("おはよう");
+	}
+	else if (score < 200)
+	{
+		DrawGraph(ImageEndBack2.x, ImageEndBack2.y, ImageEndBack2.handle, TRUE);
+		setMessage("こんにちは");
+	}
+	else if (score < 300)
+	{
+		DrawGraph(ImageEndBack3.x, ImageEndBack3.y, ImageEndBack3.handle, TRUE);
+		setMessage("さようなら");
+	}
+
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
 	//タイトルへボタンを光らせる
@@ -1063,18 +1089,6 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndAbutton2.x, ImageEndAbutton2.y, ImageEndAbutton2.handle, TRUE);
 	}
 	
-	//下キーを押すと
-	if (MY_KEY_UP(KEY_INPUT_DOWN) == TRUE)
-	{
-		ImageEndAbutton2.IsDraw = TRUE;
-		ImageEndTbutton2.IsDraw = FALSE;
-	}
-	//上キーを押すと
-	if (MY_KEY_UP(KEY_INPUT_UP) == TRUE)
-	{
-		ImageEndAbutton2.IsDraw = FALSE;
-		ImageEndTbutton2.IsDraw = TRUE;
-	}
 
 	/*DrawBox(50, 460, 550, 560, GetColor(255, 0, 0), TRUE);
 	DrawBox(50, 580, 550, 680, GetColor(255, 0, 0), TRUE);*/
@@ -1177,6 +1191,32 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageEndBack1.handle, &ImageEndBack1.width, &ImageEndBack1.height);	//画像の幅と高さを取得
 	ImageEndBack1.x = GAME_WIDTH / 2 - ImageEndBack1.width / 2;		                    //左右中央揃え
 	ImageEndBack1.y = GAME_HEIGHT / 2 - ImageEndBack1.height / 2;	                    //上下中央揃え
+
+	//エンド背景画像2
+	strcpy_s(ImageEndBack2.path, IMAGE_END_BACK2_PATH);		    //パスの設定
+	ImageEndBack2.handle = LoadGraph(ImageEndBack2.path);	    //読み込み
+	if (ImageEndBack2.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_END_BACK2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndBack2.handle, &ImageEndBack2.width, &ImageEndBack2.height);	//画像の幅と高さを取得
+	ImageEndBack2.x = GAME_WIDTH / 2 - ImageEndBack2.width / 2;		                    //左右中央揃え
+	ImageEndBack2.y = GAME_HEIGHT / 2 - ImageEndBack2.height / 2;	                    //上下中央揃え
+
+	//エンド背景画像3
+	strcpy_s(ImageEndBack3.path, IMAGE_END_BACK3_PATH);		    //パスの設定
+	ImageEndBack3.handle = LoadGraph(ImageEndBack3.path);	    //読み込み
+	if (ImageEndBack3.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_END_BACK3_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageEndBack3.handle, &ImageEndBack3.width, &ImageEndBack3.height);	//画像の幅と高さを取得
+	ImageEndBack3.x = GAME_WIDTH / 2 - ImageEndBack3.width / 2;		                    //左右中央揃え
+	ImageEndBack3.y = GAME_HEIGHT / 2 - ImageEndBack3.height / 2;	                    //上下中央揃え
 
 	//エンドタイトルへ画像
 	strcpy_s(ImageEndTbutton.path, IMAGE_END_TBUTTON_PATH);		    //パスの設定
