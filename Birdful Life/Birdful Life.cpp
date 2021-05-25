@@ -867,7 +867,7 @@ VOID MY_PLAY_PROC(VOID)
 			if (enemy[index].IsCreate == FALSE)
 			{
 				//ƒ‰ƒ“ƒ_ƒ€‚Å0~3‚ªo‚ê‚Î“G¶¬
-				int kind = GetRand(100);
+				int kind = GetRand(30);
 				if (3 >= kind)
 				{
 					switch (kind)
