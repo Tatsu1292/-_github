@@ -657,26 +657,6 @@ VOID MY_START_PROC(VOID)
 	//エンターキーを押したら、プレイシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
-
-		//プレイヤーの初期位置を設定
-		player.x = 100;
-		player.y = 400;
-
-
-		//エサの初期位置
-		for (int i = 0; i < ESA_MAX; i++)
-		{
-			esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
-
-			esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
-
-			//エサのY位置をランダムにする
-			int ichi = GetRand(GAME_HEIGHT - esa[i].height);
-			
-			esa[i].y = ichi;
-		}
-
-
 		//BGM停止
 		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
 		{
@@ -835,9 +815,38 @@ VOID MY_RULE_DRAW(VOID)
 //プレイ画面初期化
 VOID MY_PLAY_INIT(VOID)
 {
+	//背景の初期位置
+	//プレイヤーの初期位置を設定
+	player.x = 100;
+	player.y = 400;
+
+
+	//エサの初期位置
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
+
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
+
+		//エサのY位置をランダムにする
+		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
+
+		esa[i].y = ichi;
+	}
+
+	//敵の初期位置
+	for (int i = 0; i < ENEMY_NUM; i++)
+	{
+		enemy[i].IsDraw = FALSE;
+		enemy[i].IsCreate = FALSE;
+		enemy[i].image.x = GAME_WIDTH + i * 100;
+	}
+
 	//スコアの初期化
 	score = 0;
+
 	//ライフの初期化
+	player.life = 100;
 
 	return;
 }
@@ -867,7 +876,7 @@ VOID MY_PLAY_PROC(VOID)
 			if (enemy[index].IsCreate == FALSE)
 			{
 				//ランダムで0~3が出れば敵生成
-				int kind = GetRand(30);
+				int kind = GetRand(50);
 				if (3 >= kind)
 				{
 					switch (kind)
@@ -1083,7 +1092,7 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
 
-		if (enemy[i].image.x <= 0)
+		if (enemy[i].image.x + enemy[i].image.width <= 0)
 		{
 			enemy[i].image.IsDraw = FALSE;
 		}
@@ -1199,17 +1208,17 @@ VOID MY_END_PROC(VOID)
 //エンド画面の描画
 VOID MY_END_DRAW(VOID)
 {
-	if (score < 100)
+	if (score < 500)
 	{
 		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 		setMessage("おはよう");
 	}
-	else if (score < 200)
+	else if (score < 1000)
 	{
 		DrawGraph(ImageEndBack2.x, ImageEndBack2.y, ImageEndBack2.handle, TRUE);
 		setMessage("こんにちは");
 	}
-	else if (score < 300)
+	else if (1000 <= score)
 	{
 		DrawGraph(ImageEndBack3.x, ImageEndBack3.y, ImageEndBack3.handle, TRUE);
 		setMessage("さようなら");
