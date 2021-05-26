@@ -40,7 +40,13 @@
 #define MUSIC_TITLE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //タイトル画面BGM
 #define MUSIC_TITLE_SE_PATH TEXT(".\\MUSIC\\ヒヨコの鳴き声_編集済み.mp3")	//タイトル画面SE
 #define MUSIC_RULE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //ルール説明画面BGM
-#define MUSIC_END_BGM_PATH TEXT(".\\MUSIC\\ソライロビヨリ.mp3")	                //エンド画面BGM
+#define MUSIC_PLAY_BGM_PATH TEXT(".\\MUSIC\\キラキラ桜吹雪.mp3")	        //プレイ画面BGM
+#define MUSIC_END_BGM_PATH TEXT(".\\MUSIC\\ソライロビヨリ.mp3")	            //エンド画面BGM
+
+#define MUSIC_DAMAGE_PATH TEXT(".\\MUSIC\\damage1.mp3")	            //ダメージ効果音
+#define MUSIC_GET_PATH TEXT(".\\MUSIC\\score2.mp3")	            //エサをとったときの効果音
+
+#define MUSIC_KARASU_PATH TEXT(".\\MUSIC\\.mp3")	            //カラス出現時の鳴き声
 
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
@@ -220,7 +226,13 @@ int score = 0;
 MUSIC TitleBGM;	//タイトルBGM
 MUSIC TitleSE;	//タイトルSE
 MUSIC RuleBGM;	//ルール説明BGM
+MUSIC PlayBGM;
 MUSIC EndBGM;	//エンドBGM
+
+MUSIC GetSE;	//エサ取り効果音
+MUSIC DamageSE;	//ダメージ効果音
+MUSIC KarasuSE;	//カラス鳴き声
+
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;				 //タイトルロゴ
@@ -855,6 +867,14 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
+
+	//BGM再生
+	if (CheckSoundMem(PlayBGM.handle) == 0)//まだBGMがなっていなかったら
+	{
+		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, PlayBGM.handle);
+		PlaySoundMem(PlayBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
+	}
+
 	if (TekiCreateCnt < TekiCreateCntMax) { TekiCreateCnt++; }
 	else
 	{
@@ -916,6 +936,12 @@ VOID MY_PLAY_PROC(VOID)
 	//Aキーを押したら、エンドシーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
+		//BGM停止
+		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
+		{
+			StopSoundMem(TitleBGM.handle); //止める
+		}
+
 		//ゲームのシーンをエンド画面にする
 		GameScene = GAME_SCENE_END;
 
@@ -978,6 +1004,7 @@ VOID MY_PLAY_PROC(VOID)
 				esa[i].IsDraw = FALSE;
 				esa[i].x = -100;
 				score += 50;
+				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 			}
 		}
 
@@ -995,6 +1022,7 @@ VOID MY_PLAY_PROC(VOID)
 					player.life -= 1;	//ライフを減らす
 					/*mutekicount = 0;*/
 					IsMuteki = TRUE;	//一定時間、無敵状態になる
+					PlaySoundMem(DamageSE.handle, DX_PLAYTYPE_BACK); 
 
 					enemy[i].IsCreate = FALSE;
 
@@ -1089,6 +1117,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
+			PlaySoundMem(KarasuSE.handle, DX_PLAYTYPE_BACK); //カラスが画面内に入ったら鳴き声を放つ
 			enemy[i].image.IsDraw = TRUE;
 		}
 
@@ -1527,6 +1556,33 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
+	//プレイ画面BGM
+	strcpy_s(PlayBGM.path, MUSIC_PLAY_BGM_PATH);
+	PlayBGM.handle = LoadSoundMem(PlayBGM.path);
+	if (PlayBGM.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_PLAY_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//エサをとったときの効果音
+	strcpy_s(GetSE.path, MUSIC_GET_PATH);
+	GetSE.handle = LoadSoundMem(GetSE.path);
+	if (GetSE.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_GET_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
+	//ダメージを受けたときの効果音
+	strcpy_s(DamageSE.path, MUSIC_DAMAGE_PATH);
+	DamageSE.handle = LoadSoundMem(DamageSE.path);
+	if (DamageSE.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_DAMAGE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
 	//エンドBGM
 	strcpy_s(EndBGM.path, MUSIC_END_BGM_PATH);
 	EndBGM.handle = LoadSoundMem(EndBGM.path);
@@ -1545,6 +1601,9 @@ VOID MY_DELETE_MUSIC(VOID)
 	DeleteSoundMem(TitleBGM.handle);
 	DeleteSoundMem(TitleSE.handle);
 	DeleteSoundMem(RuleBGM.handle);
+	DeleteSoundMem(PlayBGM.handle);
+	DeleteSoundMem(GetSE.handle);
+	DeleteSoundMem(DamageSE.handle);
 	DeleteSoundMem(EndBGM.handle);
 
 	return;
