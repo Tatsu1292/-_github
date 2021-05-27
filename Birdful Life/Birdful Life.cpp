@@ -81,7 +81,7 @@
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
-#define ESA_MAX 10		//エサの最大出現数
+#define ESA_MAX 5	//エサの最大出現数
 
 
 //エラーメッセージ
@@ -172,7 +172,7 @@ typedef struct STRUCT_CHARA
 	iPOINT collBeforePt;		//当たる前の座標
 
 	//プレイヤー専用
-	int life = 100;		//プレイヤーのライフ
+	int life = 1;		//プレイヤーのライフ
 
 	//エネミー専用
 	BOOL IsCreate = FALSE;	//生成したか？
@@ -216,7 +216,7 @@ BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 10;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -836,9 +836,10 @@ VOID MY_PLAY_INIT(VOID)
 	//エサの初期位置
 	for (int i = 0; i < ESA_MAX; i++)
 	{
+
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 10);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
@@ -858,7 +859,10 @@ VOID MY_PLAY_INIT(VOID)
 	score = 0;
 
 	//ライフの初期化
-	player.life = 100;
+	player.life = 1;
+
+	//
+	mutekicount = 100;
 
 	return;
 }
@@ -946,9 +950,9 @@ VOID MY_PLAY_PROC(VOID)
 	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
 	{
 		//BGM停止
-		if (CheckSoundMem(TitleBGM.handle) != 0)//BGMが流れていたら
+		if (CheckSoundMem(PlayBGM.handle) != 0)//BGMが流れていたら
 		{
-			StopSoundMem(TitleBGM.handle); //止める
+			StopSoundMem(PlayBGM.handle); //止める
 		}
 
 		//ゲームのシーンをエンド画面にする
@@ -990,6 +994,10 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			esa[i].x -= 4;
 		}
+		else
+		{
+			esa[i].x = GAME_WIDTH + esa[i].width * (i + 1) * 10;
+		}
 	}
 
 	
@@ -1010,8 +1018,7 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
-				esa[i].IsDraw = FALSE;
-				esa[i].x = -100;
+				esa[i].x = GAME_WIDTH + esa[i].width * (i + 1) * 10;
 				score += 50;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 			}
@@ -1034,7 +1041,6 @@ VOID MY_PLAY_PROC(VOID)
 					PlaySoundMem(DamageSE.handle, DX_PLAYTYPE_BACK); 
 
 					enemy[i].IsCreate = FALSE;
-
 				}
 			}
 		}
