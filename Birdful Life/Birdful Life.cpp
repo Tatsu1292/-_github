@@ -76,6 +76,7 @@
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
 #define ESA_MAX 10		//エサの最大出現数
+#define LIFE_MAX 3      //ライフ最大数
 
 
 //エラーメッセージ
@@ -166,7 +167,7 @@ typedef struct STRUCT_CHARA
 	iPOINT collBeforePt;		//当たる前の座標
 
 	//プレイヤー専用
-	int life = 100;		//プレイヤーのライフ
+	int life = LIFE_MAX;		//プレイヤーのライフ
 
 	//エネミー専用
 	BOOL IsCreate = FALSE;	//生成したか？
@@ -732,7 +733,7 @@ VOID MY_RULE(VOID)
 	MY_RULE_PROC();	//プレイ画面の処理
 	MY_RULE_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "ルール説明画面(Sキーを押して下さい)", GetColor(0, 0, 0));
+	DrawString(0, 0, "ルール説明画面(SPACEキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -746,7 +747,7 @@ VOID MY_RULE_PROC(VOID)
 	}
 
 	//スペースキーを押したら、プレイシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
 	{
 		//BGM停止
 		if (CheckSoundMem(RuleBGM.handle) != 0)//BGMが流れていたら
@@ -832,6 +833,7 @@ VOID MY_PLAY_INIT(VOID)
 		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
 
 		esa[i].y = ichi;
+
 	}
 
 	//敵の初期位置
@@ -846,7 +848,10 @@ VOID MY_PLAY_INIT(VOID)
 	score = 0;
 
 	//ライフの初期化
-	player.life = 100;
+	player.life = LIFE_MAX;
+
+	//無敵状態の初期化
+	mutekicount = 100;
 
 	return;
 }
@@ -857,7 +862,7 @@ VOID MY_PLAY(VOID)
 	MY_PLAY_PROC();	//プレイ画面の処理
 	MY_PLAY_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "プレイ画面(Aを押して下さい)", GetColor(0, 0, 0));
+	DrawString(0, 0, "プレイ画面(カラスに当たったら負け)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -923,8 +928,9 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//Aキーを押したら、エンドシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+	if (player.life == 0)
 	{
+
 		//ゲームのシーンをエンド画面にする
 		GameScene = GAME_SCENE_END;
 
@@ -984,7 +990,6 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
-				esa[i].IsDraw = FALSE;
 				esa[i].x = -100;
 				score += 50;
 			}
@@ -1151,16 +1156,11 @@ VOID MY_END_PROC(VOID)
 		PlaySoundMem(EndBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
 	}
 
-	//エスケープキーを押したら、スタートシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
-	{
-		GameScene = GAME_SCENE_START;
-	}
 
 	//タイトルへ戻るボタン
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
-		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+		if (MY_KEY_UP(KEY_INPUT_RETURN) == TRUE)
 		{
 			//BGM停止
 			if (CheckSoundMem(EndBGM.handle) != 0)//BGMが流れていたら
@@ -1175,7 +1175,7 @@ VOID MY_END_PROC(VOID)
 	//もう一度プレイボタン
 	if (ImageEndAbutton2.IsDraw == TRUE)
 	{
-		if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE)
+		if (MY_KEY_UP(KEY_INPUT_RETURN) == TRUE)
 		{
 			//BGM停止
 			if (CheckSoundMem(EndBGM.handle) != 0)//BGMが流れていたら
@@ -1211,17 +1211,26 @@ VOID MY_END_DRAW(VOID)
 	if (score < 500)
 	{
 		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
-		setMessage("おはよう");
+		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
+		{
+			setMessage("おはよう");
+		}
 	}
 	else if (score < 1000)
 	{
 		DrawGraph(ImageEndBack2.x, ImageEndBack2.y, ImageEndBack2.handle, TRUE);
-		setMessage("こんにちは");
+		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
+		{
+		    setMessage("こんにちは");
+		}
 	}
 	else if (1000 <= score)
 	{
 		DrawGraph(ImageEndBack3.x, ImageEndBack3.y, ImageEndBack3.handle, TRUE);
-		setMessage("さようなら");
+		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
+		{
+		    setMessage("さようなら");
+		}
 	}
 
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
