@@ -45,13 +45,13 @@
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
-#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン1
+#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
-#define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\Easy_logo.png")            //エンド　タイトルへボタン
-#define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\Hard_logo.png")            //エンド　もう一回ボタン
-#define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\Easy_logo2.png")           //エンド　タイトルへボタン2
-#define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\Hard_logo2.png")           //エンド　もう一回ボタン2
+#define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\タイトルにもどるボタン暗.png")            //エンド　タイトルへボタン
+#define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\もういちど遊ぶボタン暗.png")            //エンド　もう一回ボタン
+#define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\タイトルにもどるボタン明.png")           //エンド　タイトルへボタン2
+#define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\もういちど遊ぶボタン明.png")           //エンド　もう一回ボタン2
 
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 #define IMAGE_TITLE_PUSH_PATH	 TEXT(".\\IMAGE\\PushEnterToStart.png")	//エンターキーでスタートのロゴ
@@ -70,13 +70,13 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 #define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
 #define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
-#define ENEMY_NUM				50    //　敵のＭＡＸ値
+#define ENEMY_NUM				30    //　敵のＭＡＸ値
 
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
 #define ESA_MAX 10		//エサの最大出現数
-#define LIFE_MAX 3      //ライフ最大数
+#define LIFE_MAX 1      //ライフ最大数
 
 
 //エラーメッセージ
@@ -93,7 +93,7 @@
 #define MESSAGE_FONT_SIZE      100          //フォントの大きさ
 #define MESSAGE_MAX_LENGTH     1000          //最大文字数
 #define MESSAGE_MAX_LINE       20           //最大行数
-#define MESSAGE_BOX_X          700          //メッセージボックスのX座標
+#define MESSAGE_BOX_X          600          //メッセージボックスのX座標
 #define MESSAGE_BOX_Y          50           //メッセージボックスのY座標
 #define MESSAGE_BOX_GRAPHIC_FILENAME       "./IMAGE/背景連続1.png"
 
@@ -880,9 +880,9 @@ VOID MY_PLAY_PROC(VOID)
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
-				//ランダムで0~3が出れば敵生成
+				//ランダムで0,1が出れば敵生成
 				int kind = GetRand(50);
-				if (3 >= kind)
+				if (2 > kind)
 				{
 					switch (kind)
 					{
@@ -1213,7 +1213,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-			setMessage("おはよう");
+			setMessage("もっとよこせ");
 		}
 	}
 	else if (score < 1000)
@@ -1385,7 +1385,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndTbutton.handle, &ImageEndTbutton.width, &ImageEndTbutton.height);	//画像の幅と高さを取得
-	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2 - 400;		            //左右中央揃え
 	ImageEndTbutton.y = GAME_HEIGHT / 2 - ImageEndTbutton.height / 2 + 100;	                    //上下中央揃え
 
 	//エンドもう一度画像
@@ -1398,7 +1398,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndAbutton.handle, &ImageEndAbutton.width, &ImageEndAbutton.height);	//画像の幅と高さを取得
-	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2 - 400;		            //左右中央揃え
 	ImageEndAbutton.y = GAME_HEIGHT / 2 - ImageEndAbutton.height / 2 + 220;	                    //上下中央揃え
 	
 	//エンドタイトルへ2画像
@@ -1411,7 +1411,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndTbutton2.handle, &ImageEndTbutton2.width, &ImageEndTbutton2.height);	//画像の幅と高さを取得
-	ImageEndTbutton2.x = GAME_WIDTH / 2 - ImageEndTbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton2.x = GAME_WIDTH / 2 - ImageEndTbutton2.width / 2 - 400;		            //左右中央揃え
 	ImageEndTbutton2.y = GAME_HEIGHT / 2 - ImageEndTbutton2.height / 2 + 100;	                    //上下中央揃え
 	ImageEndTbutton2.IsDraw = TRUE;
 
@@ -1425,7 +1425,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndAbutton2.handle, &ImageEndAbutton2.width, &ImageEndAbutton2.height);	//画像の幅と高さを取得
-	ImageEndAbutton2.x = GAME_WIDTH / 2 - ImageEndAbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton2.x = GAME_WIDTH / 2 - ImageEndAbutton2.width / 2 - 400;		            //左右中央揃え
 	ImageEndAbutton2.y = GAME_HEIGHT / 2 - ImageEndAbutton2.height / 2 + 220;	                    //上下中央揃え
 	ImageEndAbutton2.IsDraw = FALSE;
 
@@ -1636,7 +1636,7 @@ VOID drawMessage()
 
 	//メッセージボックス描画
 	//DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxGraphHandle, FALSE);
-	DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
+	//DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
 
 	if (message[currentCursor] != '\0') {
 		currentCursor++;
