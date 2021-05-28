@@ -1233,6 +1233,10 @@ VOID MY_END_DRAW(VOID)
 		}
 	}
 
+	SetFontSize(50);
+	DrawString(55, 100, "今回のスコアは", GetColor(0, 0, 0));
+	SetFontSize(100);
+	DrawFormatString(150, 200,GetColor(0, 0, 0),"%d",score);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
 	//タイトルへボタンを光らせる
