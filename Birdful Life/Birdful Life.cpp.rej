@@ -1,0 +1,11 @@
+diff a/Birdful Life/Birdful Life.cpp b/Birdful Life/Birdful Life.cpp	(rejected hunks)
+@@ -1018,8 +1018,7 @@
+ 
+ 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
+ 			{
+-				esa[i].IsDraw = FALSE;
+-				esa[i].x = -100;
++				esa[i].x = GAME_WIDTH + esa[i].width * (i + 1) * 10;
+ 				score += 50;
+ 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
+ 			}
