@@ -40,24 +40,18 @@
 #define MUSIC_TITLE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //タイトル画面BGM
 #define MUSIC_TITLE_SE_PATH TEXT(".\\MUSIC\\ヒヨコの鳴き声_編集済み.mp3")	//タイトル画面SE
 #define MUSIC_RULE_BGM_PATH TEXT(".\\MUSIC\\木のお皿.mp3")	                //ルール説明画面BGM
-#define MUSIC_PLAY_BGM_PATH TEXT(".\\MUSIC\\キラキラ桜吹雪.mp3")	        //プレイ画面BGM
-#define MUSIC_END_BGM_PATH TEXT(".\\MUSIC\\ソライロビヨリ.mp3")	            //エンド画面BGM
-
-#define MUSIC_DAMAGE_PATH TEXT(".\\MUSIC\\damage1.mp3")	            //ダメージ効果音
-#define MUSIC_GET_PATH TEXT(".\\MUSIC\\score2.mp3")	            //エサをとったときの効果音
-
-#define MUSIC_KARASU_PATH TEXT(".\\MUSIC\\.mp3")	            //カラス出現時の鳴き声
+#define MUSIC_END_BGM_PATH TEXT(".\\MUSIC\\ソライロビヨリ.mp3")	                //エンド画面BGM
 
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
-#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン1
+#define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
-#define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\Easy_logo.png")            //エンド　タイトルへボタン
-#define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\Hard_logo.png")            //エンド　もう一回ボタン
-#define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\Easy_logo2.png")           //エンド　タイトルへボタン2
-#define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\Hard_logo2.png")           //エンド　もう一回ボタン2
+#define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\タイトルにもどるボタン暗.png")            //エンド　タイトルへボタン
+#define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\もういちど遊ぶボタン暗.png")            //エンド　もう一回ボタン
+#define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\タイトルにもどるボタン明.png")           //エンド　タイトルへボタン2
+#define IMAGE_END_ABUTTON2_PATH  TEXT(".\\IMAGE\\もういちど遊ぶボタン明.png")           //エンド　もう一回ボタン2
 
 #define IMAGE_TITLE_ROGO_PATH    TEXT(".\\IMAGE\\rogo1.png")           //タイトルロゴ
 #define IMAGE_TITLE_PUSH_PATH	 TEXT(".\\IMAGE\\PushEnterToStart.png")	//エンターキーでスタートのロゴ
@@ -76,17 +70,13 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 #define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
 #define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
-#define ENEMY_NUM				50    //　敵のＭＡＸ値
+#define ENEMY_NUM				30    //　敵のＭＡＸ値
 
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
-<<<<<<< HEAD
-#define ESA_MAX 5	//エサの最大出現数
-=======
 #define ESA_MAX 10		//エサの最大出現数
-#define LIFE_MAX 3      //ライフ最大数
->>>>>>> a347ea7a3139991cf9364a0d2f6f78376394bf70
+#define LIFE_MAX 1      //ライフ最大数
 
 
 //エラーメッセージ
@@ -103,7 +93,7 @@
 #define MESSAGE_FONT_SIZE      100          //フォントの大きさ
 #define MESSAGE_MAX_LENGTH     1000          //最大文字数
 #define MESSAGE_MAX_LINE       20           //最大行数
-#define MESSAGE_BOX_X          700          //メッセージボックスのX座標
+#define MESSAGE_BOX_X          600          //メッセージボックスのX座標
 #define MESSAGE_BOX_Y          50           //メッセージボックスのY座標
 #define MESSAGE_BOX_GRAPHIC_FILENAME       "./IMAGE/背景連続1.png"
 
@@ -177,11 +167,7 @@ typedef struct STRUCT_CHARA
 	iPOINT collBeforePt;		//当たる前の座標
 
 	//プレイヤー専用
-<<<<<<< HEAD
-	int life = 1;		//プレイヤーのライフ
-=======
 	int life = LIFE_MAX;		//プレイヤーのライフ
->>>>>>> a347ea7a3139991cf9364a0d2f6f78376394bf70
 
 	//エネミー専用
 	BOOL IsCreate = FALSE;	//生成したか？
@@ -225,7 +211,7 @@ BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 10;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -235,13 +221,7 @@ int score = 0;
 MUSIC TitleBGM;	//タイトルBGM
 MUSIC TitleSE;	//タイトルSE
 MUSIC RuleBGM;	//ルール説明BGM
-MUSIC PlayBGM;
 MUSIC EndBGM;	//エンドBGM
-
-MUSIC GetSE;	//エサ取り効果音
-MUSIC DamageSE;	//ダメージ効果音
-MUSIC KarasuSE;	//カラス鳴き声
-
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;				 //タイトルロゴ
@@ -845,10 +825,9 @@ VOID MY_PLAY_INIT(VOID)
 	//エサの初期位置
 	for (int i = 0; i < ESA_MAX; i++)
 	{
-
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 10);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
@@ -869,15 +848,9 @@ VOID MY_PLAY_INIT(VOID)
 	score = 0;
 
 	//ライフの初期化
-<<<<<<< HEAD
-	player.life = 1;
-
-	//
-=======
 	player.life = LIFE_MAX;
 
 	//無敵状態の初期化
->>>>>>> a347ea7a3139991cf9364a0d2f6f78376394bf70
 	mutekicount = 100;
 
 	return;
@@ -896,14 +869,6 @@ VOID MY_PLAY(VOID)
 //プレイ画面の処理
 VOID MY_PLAY_PROC(VOID)
 {
-
-	//BGM再生
-	if (CheckSoundMem(PlayBGM.handle) == 0)//まだBGMがなっていなかったら
-	{
-		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, PlayBGM.handle);
-		PlaySoundMem(PlayBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
-	}
-
 	if (TekiCreateCnt < TekiCreateCntMax) { TekiCreateCnt++; }
 	else
 	{
@@ -915,9 +880,9 @@ VOID MY_PLAY_PROC(VOID)
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
-				//ランダムで0~3が出れば敵生成
+				//ランダムで0,1が出れば敵生成
 				int kind = GetRand(50);
-				if (3 >= kind)
+				if (2 > kind)
 				{
 					switch (kind)
 					{
@@ -965,14 +930,6 @@ VOID MY_PLAY_PROC(VOID)
 	//Aキーを押したら、エンドシーンへ移動する
 	if (player.life == 0)
 	{
-<<<<<<< HEAD
-		//BGM停止
-		if (CheckSoundMem(PlayBGM.handle) != 0)//BGMが流れていたら
-		{
-			StopSoundMem(PlayBGM.handle); //止める
-		}
-=======
->>>>>>> a347ea7a3139991cf9364a0d2f6f78376394bf70
 
 		//ゲームのシーンをエンド画面にする
 		GameScene = GAME_SCENE_END;
@@ -1013,10 +970,6 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			esa[i].x -= 4;
 		}
-		else
-		{
-			esa[i].x = GAME_WIDTH + esa[i].width * (i + 1) * 10;
-		}
 	}
 
 	
@@ -1037,13 +990,8 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
-<<<<<<< HEAD
-				esa[i].x = GAME_WIDTH + esa[i].width * (i + 1) * 10;
-=======
 				esa[i].x = -100;
->>>>>>> a347ea7a3139991cf9364a0d2f6f78376394bf70
 				score += 50;
-				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 			}
 		}
 
@@ -1061,9 +1009,9 @@ VOID MY_PLAY_PROC(VOID)
 					player.life -= 1;	//ライフを減らす
 					/*mutekicount = 0;*/
 					IsMuteki = TRUE;	//一定時間、無敵状態になる
-					PlaySoundMem(DamageSE.handle, DX_PLAYTYPE_BACK); 
 
 					enemy[i].IsCreate = FALSE;
+
 				}
 			}
 		}
@@ -1155,7 +1103,6 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
-			PlaySoundMem(KarasuSE.handle, DX_PLAYTYPE_BACK); //カラスが画面内に入ったら鳴き声を放つ
 			enemy[i].image.IsDraw = TRUE;
 		}
 
@@ -1266,7 +1213,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-			setMessage("おはよう");
+			setMessage("もっとよこせ");
 		}
 	}
 	else if (score < 1000)
@@ -1438,7 +1385,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndTbutton.handle, &ImageEndTbutton.width, &ImageEndTbutton.height);	//画像の幅と高さを取得
-	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton.x = GAME_WIDTH / 2 - ImageEndTbutton.width / 2 - 400;		            //左右中央揃え
 	ImageEndTbutton.y = GAME_HEIGHT / 2 - ImageEndTbutton.height / 2 + 100;	                    //上下中央揃え
 
 	//エンドもう一度画像
@@ -1451,7 +1398,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndAbutton.handle, &ImageEndAbutton.width, &ImageEndAbutton.height);	//画像の幅と高さを取得
-	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton.x = GAME_WIDTH / 2 - ImageEndAbutton.width / 2 - 400;		            //左右中央揃え
 	ImageEndAbutton.y = GAME_HEIGHT / 2 - ImageEndAbutton.height / 2 + 220;	                    //上下中央揃え
 	
 	//エンドタイトルへ2画像
@@ -1464,7 +1411,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndTbutton2.handle, &ImageEndTbutton2.width, &ImageEndTbutton2.height);	//画像の幅と高さを取得
-	ImageEndTbutton2.x = GAME_WIDTH / 2 - ImageEndTbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndTbutton2.x = GAME_WIDTH / 2 - ImageEndTbutton2.width / 2 - 400;		            //左右中央揃え
 	ImageEndTbutton2.y = GAME_HEIGHT / 2 - ImageEndTbutton2.height / 2 + 100;	                    //上下中央揃え
 	ImageEndTbutton2.IsDraw = TRUE;
 
@@ -1478,7 +1425,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(ImageEndAbutton2.handle, &ImageEndAbutton2.width, &ImageEndAbutton2.height);	//画像の幅と高さを取得
-	ImageEndAbutton2.x = GAME_WIDTH / 2 - ImageEndAbutton2.width / 2 - 250;		            //左右中央揃え
+	ImageEndAbutton2.x = GAME_WIDTH / 2 - ImageEndAbutton2.width / 2 - 400;		            //左右中央揃え
 	ImageEndAbutton2.y = GAME_HEIGHT / 2 - ImageEndAbutton2.height / 2 + 220;	                    //上下中央揃え
 	ImageEndAbutton2.IsDraw = FALSE;
 
@@ -1598,33 +1545,6 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
-	//プレイ画面BGM
-	strcpy_s(PlayBGM.path, MUSIC_PLAY_BGM_PATH);
-	PlayBGM.handle = LoadSoundMem(PlayBGM.path);
-	if (PlayBGM.handle == -1)
-	{
-		MessageBox(GetMainWindowHandle(), MUSIC_PLAY_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//エサをとったときの効果音
-	strcpy_s(GetSE.path, MUSIC_GET_PATH);
-	GetSE.handle = LoadSoundMem(GetSE.path);
-	if (GetSE.handle == -1)
-	{
-		MessageBox(GetMainWindowHandle(), MUSIC_GET_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
-	//ダメージを受けたときの効果音
-	strcpy_s(DamageSE.path, MUSIC_DAMAGE_PATH);
-	DamageSE.handle = LoadSoundMem(DamageSE.path);
-	if (DamageSE.handle == -1)
-	{
-		MessageBox(GetMainWindowHandle(), MUSIC_DAMAGE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-
 	//エンドBGM
 	strcpy_s(EndBGM.path, MUSIC_END_BGM_PATH);
 	EndBGM.handle = LoadSoundMem(EndBGM.path);
@@ -1643,9 +1563,6 @@ VOID MY_DELETE_MUSIC(VOID)
 	DeleteSoundMem(TitleBGM.handle);
 	DeleteSoundMem(TitleSE.handle);
 	DeleteSoundMem(RuleBGM.handle);
-	DeleteSoundMem(PlayBGM.handle);
-	DeleteSoundMem(GetSE.handle);
-	DeleteSoundMem(DamageSE.handle);
 	DeleteSoundMem(EndBGM.handle);
 
 	return;
@@ -1719,7 +1636,7 @@ VOID drawMessage()
 
 	//メッセージボックス描画
 	//DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxGraphHandle, FALSE);
-	DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
+	//DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
 
 	if (message[currentCursor] != '\0') {
 		currentCursor++;
