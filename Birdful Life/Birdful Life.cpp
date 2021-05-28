@@ -78,7 +78,7 @@
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
-#define ESA_MAX 10		//エサの最大出現数
+#define ESA_MAX 20		//エサの最大出現数
 #define LIFE_MAX 1      //ライフ最大数
 
 
@@ -834,7 +834,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 5);	//エサのX初期位置(エサ五個分の横幅間隔で出現); 
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 10);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
@@ -984,17 +984,6 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 
-	//エサを動かす
-	for (int i = 0; i < ESA_MAX; i++)
-	{
-		if (esa[i].x > 0 - esa[i].width)
-		{
-			esa[i].x -= 4;
-		}
-	}
-
-	
-
 		RECT PlayerRect;
 		PlayerRect.left = player.x;
 		PlayerRect.top = player.y;
@@ -1003,6 +992,17 @@ VOID MY_PLAY_PROC(VOID)
 
 		for (int i = 0; i < ESA_MAX; i++)
 		{
+			
+			if (esa[i].x > 0 - esa[i].width)
+			{
+				esa[i].x -= 4;	//エサを左に動かす
+			}
+			else
+			{
+				int X_ichi = GetRand(20);
+				esa[i].x = (GAME_WIDTH + esa[i].width) * X_ichi;	//エサを右画面外にランダム配置
+			}
+
 			RECT EsaRect;
 			EsaRect.left = esa[i].x;
 			EsaRect.top = esa[i].y;
@@ -1011,9 +1011,10 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
-				esa[i].x = -100;
 				score += 50;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
+				int X_ichi = GetRand(20);
+				esa[i].x = (GAME_WIDTH + esa[i].width) * X_ichi; //エサを右画面外にランダム配置
 			}
 		}
 
