@@ -1166,7 +1166,6 @@ VOID MY_END(VOID)
 	MY_END_PROC();	//エンド画面の処理
 	MY_END_DRAW();	//エンド画面の描画
 
-	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
