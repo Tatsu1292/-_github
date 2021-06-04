@@ -723,10 +723,10 @@ VOID MY_START_DRAW(VOID)
 			DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
 
 			//【デバッグ用】背景画像の数字をテスト的に表示
-			DrawFormatString(
+			/*DrawFormatString(
 				ImageTitleBack[num].image.x,
 				ImageTitleBack[num].image.y,
-				GetColor(255, 0, 0), "背景画像：%d", num + 1);
+				GetColor(255, 0, 0), "背景画像：%d", num + 1);*/
 		}
 	}
 
@@ -808,10 +808,10 @@ VOID MY_RULE_DRAW(VOID)
 				DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
 
 				//【デバッグ用】背景画像の数字をテスト的に表示
-				DrawFormatString(
+				/*DrawFormatString(
 					ImageTitleBack[num].image.x,
 					ImageTitleBack[num].image.y,
-					GetColor(255, 0, 0), "背景画像：%d", num + 1);
+					GetColor(255, 0, 0), "背景画像：%d", num + 1);*/
 			}
 		}
 
@@ -1095,10 +1095,10 @@ VOID MY_PLAY_DRAW(VOID)
 			DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
 
 			//【デバッグ用】背景画像の数字をテスト的に表示
-			DrawFormatString(
+			/*DrawFormatString(
 				ImageTitleBack[num].image.x,
 				ImageTitleBack[num].image.y,
-				GetColor(255, 0, 0), "背景画像：%d", num + 1);
+				GetColor(255, 0, 0), "背景画像：%d", num + 1);*/
 		}
 	}
 
@@ -1112,14 +1112,14 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(esa[i].x, esa[i].y, esa[i].handle, TRUE);
 		}
-		DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
+		//DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
 	}
 
 
 	//敵の描画
 	for (int i = 0; i < ENEMY_NUM; i++)
 	{
-		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
+		//DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
 
 		if (enemy[i].image.x + enemy[i].image.width <= 0)
 		{
@@ -1154,7 +1154,7 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 
-	DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
+	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
 
 
 	return;
@@ -1237,7 +1237,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack1.x, ImageEndBack1.y, ImageEndBack1.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-			setMessage("もっとよこせ");
+			setMessage("もっとくれ!!");
 		}
 	}
 	else if (score < 1000)
