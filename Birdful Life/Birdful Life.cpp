@@ -206,9 +206,11 @@ CHARA enemy[ENEMY_NUM];
 CHARA karasu1;
 CHARA karasu2;
 
+//カウントまとめ
 int playercount; //プレイヤーのアニメーション用カウント
 int mutekicount;	//無敵時間を測るカウント
 int tennmetu;		//点滅時間を測るカウント
+int Lvcount;			//レベルアップの画像を表示する時間
 
 BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
@@ -860,6 +862,9 @@ VOID MY_PLAY_INIT(VOID)
 	//無敵状態の初期化
 	mutekicount = 100;
 
+	//レベルアップ画像の表示カウントの初期化
+	Lvcount = 0;
+
 	return;
 }
 
@@ -1079,6 +1084,20 @@ VOID MY_PLAY_PROC(VOID)
 
 	}
 
+	if (score == 100)
+	{
+		if (Lvcount <= 100)
+		{
+			Lvcount++;
+			ImageRuleEx.IsDraw = TRUE;
+		}
+		else
+		{
+			ImageRuleEx.IsDraw = FALSE;
+		}
+		
+	}
+
 	return;
 }
 
@@ -1156,6 +1175,10 @@ VOID MY_PLAY_DRAW(VOID)
 
 	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
 
+	if (ImageRuleEx.IsDraw == TRUE)
+	{
+		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
+	}
 
 	return;
 }
@@ -1362,6 +1385,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageRuleEx.handle, &ImageRuleEx.width, &ImageRuleEx.height);	//画像の幅と高さを取得
 	ImageRuleEx.x = GAME_WIDTH / 2 - ImageRuleEx.width / 2;		                    //左右中央揃え
 	ImageRuleEx.y = GAME_HEIGHT / 2 - ImageRuleEx.height / 2;	                    //上下中央揃え
+	ImageRuleEx.IsDraw = FALSE;
 
 	//エンド背景画像1
 	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		    //パスの設定
