@@ -29,8 +29,8 @@
 #define GAME_SOUND_VOLUME	255*GAME_SOUND_VOLUME_PER/100	//↑の割合の音量
 
 //フォント
-#define FONT_TANU_PATH			TEXT(".\\FONT\\TanukiMagic.ttf")	//フォントの場所
-#define FONT_TANU_NAME			TEXT("たぬき油性マジック")			//フォントの名前
+#define FONT_UZU_PATH			TEXT(".\\FONT\\uzura.ttf")	     //フォントの場所
+#define FONT_UZU_NAME			TEXT("うずらフォント")			//フォントの名前
 
 //エラーメッセージ
 #define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
@@ -97,7 +97,7 @@
 #define MESSAGE_FONT_SIZE      100          //フォントの大きさ
 #define MESSAGE_MAX_LENGTH     1000          //最大文字数
 #define MESSAGE_MAX_LINE       20           //最大行数
-#define MESSAGE_BOX_X          600          //メッセージボックスのX座標
+#define MESSAGE_BOX_X          610          //メッセージボックスのX座標
 #define MESSAGE_BOX_Y          50           //メッセージボックスのY座標
 #define MESSAGE_BOX_GRAPHIC_FILENAME       "./IMAGE/背景連続1.png"
 
@@ -249,6 +249,9 @@ IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
 IMAGE ImageEndBack1;                                //エンド背景ひなパターン1
 IMAGE ImageEndBack2;                                //エンド背景ひなパターン2
 IMAGE ImageEndBack3;                                //エンド背景ひなパターン3
+
+//フォント関連
+FONT FontUzu;
 
 //ひなセリフ関連
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
@@ -608,10 +611,10 @@ BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
 BOOL MY_FONT_INSTALL_ONCE(VOID)
 {
 	//フォントを一時的に読み込み(WinAPI)
-	if (AddFontResourceEx(FONT_TANU_PATH, FR_PRIVATE, NULL) == 0)
+	if (AddFontResourceEx(FONT_UZU_PATH, FR_PRIVATE, NULL) == 0)
 	{
 		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), FONT_TANU_NAME, FONT_INSTALL_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), FONT_UZU_NAME, FONT_INSTALL_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 
@@ -622,7 +625,7 @@ BOOL MY_FONT_INSTALL_ONCE(VOID)
 VOID MY_FONT_UNINSTALL_ONCE(VOID)
 {
 	//一時的に読み込んだフォントを削除(WinAPI)
-	RemoveFontResourceEx(FONT_TANU_PATH, FR_PRIVATE, NULL);
+	RemoveFontResourceEx(FONT_UZU_PATH, FR_PRIVATE, NULL);
 
 	return;
 }
@@ -635,13 +638,23 @@ VOID MY_FONT_UNINSTALL_ONCE(VOID)
 //戻り値：BOOL ：エラー時はFALSE / 正常時はTRUE
 BOOL MY_FONT_CREATE(VOID)
 {
+	strcpy_s(FontUzu.path, sizeof(FontUzu.path), FONT_UZU_PATH);
+	strcpy_s(FontUzu.name, sizeof(FontUzu.name), FONT_UZU_NAME);
+	FontUzu.handle = -1;
+	FontUzu.size = 100;
+	FontUzu.bold = 1;
+	FontUzu.type = DX_FONTTYPE_ANTIALIASING_EDGE;
+
+	FontUzu.handle = CreateFontToHandle(FontUzu.name, FontUzu.size, FontUzu.bold, FontUzu.type);
+	if (FontUzu.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_UZU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
+
 	return TRUE;
 }
 
 //フォントを削除する関数
 VOID MY_FONT_DELETE(VOID)
 {
-
+	DeleteFontToHandle(FontUzu.handle);
 	return;
 }
 
@@ -1302,9 +1315,8 @@ VOID MY_END_DRAW(VOID)
 	}
 
 	SetFontSize(50);
-	DrawString(55, 100, "今回のスコアは", GetColor(0, 0, 0));
-	SetFontSize(100);
-	DrawFormatString(150, 200,GetColor(0, 0, 0),"%d",score);
+	DrawStringToHandle(80, 100, "スコア", GetColor(0, 0, 0), FontUzu.handle);
+	DrawFormatStringToHandle(150, 250,GetColor(0, 0, 0), FontUzu.handle, "%d", score);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
 	//タイトルへボタンを光らせる
@@ -1704,6 +1716,7 @@ VOID MY_DELETE_MUSIC(VOID)
 	return;
 }
 
+
 int isJapanese(unsigned char code)
 {
 	if ((code >= 0x81 && code <= 0x9F) ||
@@ -1761,7 +1774,7 @@ void writeSubstring(char* message, int start, int len,
 	}
 	messageBuffer[bufferLine][i] = '\0';
 	//メッセージ描画
-	DrawString(posX, posY, messageBuffer[bufferLine], color);
+	DrawStringToHandle(posX, posY, messageBuffer[bufferLine], color,FontUzu.handle);
 }
 
 
