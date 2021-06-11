@@ -78,8 +78,9 @@
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
+#define IMAGE_LIFE_PATH	TEXT(".\\IMAGE\\ライフ.png")	//ライフの画像
 #define ESA_MAX 20		//エサの最大出現数
-#define LIFE_MAX 1      //ライフ最大数
+#define LIFE_MAX 3     //ライフ最大数
 
 
 //エラーメッセージ
@@ -220,6 +221,7 @@ int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
+IMAGE heart[LIFE_MAX];
 int score = 0;
 
 //音楽関連
@@ -860,7 +862,7 @@ VOID MY_PLAY_INIT(VOID)
 	player.life = LIFE_MAX;
 
 	//無敵状態の初期化
-	mutekicount = 100;
+	/*mutekicount = 100;*/
 
 	//レベルアップ画像の表示カウントの初期化
 	Lvcount = 0;
@@ -919,7 +921,7 @@ VOID MY_PLAY_PROC(VOID)
 					enemy[index].image.x = GAME_WIDTH + index * (+100);	
 					enemy[index].image.y = GetRand(GAME_HEIGHT - enemy[index].image.height);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
-					EnemyAtari(&enemy[index]);
+					/*EnemyAtari(&enemy[index]);*/
 
 					enemy[index].IsCreate = TRUE;
 				}
@@ -1034,12 +1036,12 @@ VOID MY_PLAY_PROC(VOID)
 			{
 				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
 				{
-					player.life -= 1;	//ライフを減らす
 					/*mutekicount = 0;*/
 					IsMuteki = TRUE;	//一定時間、無敵状態になる
+					player.life--;	//ライフを減らす
 					PlaySoundMem(DamageSE.handle, DX_PLAYTYPE_BACK);
 
-					enemy[i].IsCreate = FALSE;
+					/*enemy[i].IsCreate = FALSE;*/
 
 				}
 			}
@@ -1179,6 +1181,26 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
 	}
+
+
+
+	//ライフの描画
+
+	if (player.life > 0)
+	{
+		DrawGraph(heart[2].x, heart[2].y, heart[2].handle, TRUE);
+
+		if (player.life > 1)
+		{
+			DrawGraph(heart[1].x, heart[1].y, heart[1].handle, TRUE);
+
+			if (player.life > 2)
+			{
+				DrawGraph(heart[0].x, heart[0].y, heart[0].handle, TRUE);
+			}
+		}
+	}
+
 
 	return;
 }
@@ -1531,6 +1553,35 @@ BOOL MY_LOAD_IMAGE(VOID)
 	esa[0].IsDraw = TRUE;
 
 
+	//ハート
+	strcpy_s(heart[0].path, IMAGE_LIFE_PATH);
+	heart[0].handle = LoadGraph(heart[0].path);
+	if (heart[0].handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_LIFE_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(heart[0].handle, &heart[0].width, &heart[0].height);	//画像の幅と高さを取得
+	heart[0].IsDraw = TRUE;
+
+	//ハートの位置
+	for (int i = 0; i < LIFE_MAX; i++)
+	{
+		heart[i] = heart[0];
+
+		heart[i].x = 900 + heart[i].width * i;
+		heart[i].y = 30;
+
+		/*heart[1].x = 770;
+		heart[1].y = 30;
+
+		heart[2].x = 690;
+		heart[2].y = 30;*/
+
+	}
+
+
+
 
 
 	return TRUE;
@@ -1548,6 +1599,10 @@ VOID MY_DELETE_IMAGE(VOID)
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
 		DeleteGraph(ImageTitleBack[0].image.handle);
+	}
+	for (int i = 0; i < LIFE_MAX; i++)
+	{
+		DeleteGraph(heart[i].handle);
 	}
 	DeleteGraph(ImageTitleRogo.handle);//タイトルロゴ
 	DeleteGraph(ImageTitlePush.handle);//PUSU_TO_ENTERロゴ
@@ -1782,17 +1837,6 @@ VOID EnemyAtari(CHARA* e)
 	return;
 }
 
-int ENEMY_CHECK()
-{
-	for (int i = 0; i < ENEMY_NUM; i++)
-	{
-		if (enemy[i].image.IsDraw == FALSE) //敵の画像がなかったら当たり判定がなくなる
-		{
-			return i;
-		}
-	}
-	return -1;
-}
 
 //領域の当たり判定
 BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
