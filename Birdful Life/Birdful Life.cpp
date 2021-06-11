@@ -109,6 +109,13 @@ enum GAME_SCENE {
 	GAME_SCENE_END,
 };	//ゲームのシーン
 
+enum GAME_LEVEL
+{
+	LEVEL_EASY,
+	LEVEL_NOMAL,
+	LEVEL_HARD,
+}; //ゲームレベル
+
 //int型のPOINT構造体
 typedef struct STRUCT_I_POINT
 {
@@ -201,6 +208,7 @@ MOUSE mouse;
 
 //ゲーム関連
 int GameScene;		//ゲームシーンを管理
+int GameLevel;      //ゲームレベルを管理
 
 //キャラクター関連
 CHARA player; 
@@ -217,6 +225,8 @@ int Lvcount;			//レベルアップの画像を表示する時間
 BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
+//敵生成関連
+int enemykind;                          //敵の種類
 int TekiCreateCnt = 0;					//敵を作る間隔
 int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
@@ -345,6 +355,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	GameScene = GAME_SCENE_START;	//ゲームシーンはスタート画面から
+	GameLevel = LEVEL_EASY;         //イージーから
 	SetDrawScreen(DX_SCREEN_BACK);	//Draw系関数は裏画面に描画
 
 	//無限ループ
@@ -919,10 +930,18 @@ VOID MY_PLAY_PROC(VOID)
 			if (enemy[index].IsCreate == FALSE)
 			{
 				//ランダムで0,1が出れば敵生成
-				int kind = GetRand(50);
-				if (2 > kind)
+				if (GameLevel == LEVEL_EASY)
 				{
-					switch (kind)
+					enemykind = GetRand(100);
+				}
+				else if (GameLevel == LEVEL_NOMAL)
+				{
+					enemykind = GetRand(50);
+				}
+				
+				if (2 > enemykind)
+				{
+					switch (enemykind)
 					{
 					case 0:
 						enemy[index] = karasu1;
@@ -1107,8 +1126,9 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//レベルアップ
-	if (score == 100) 
+	if (score == 500) 
 	{
+		GameLevel = LEVEL_NOMAL;
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
@@ -1327,11 +1347,11 @@ VOID MY_END_DRAW(VOID)
 		}
 	}
 
-	SetFontSize(50);
 	DrawStringToHandle(80, 100, "スコア", GetColor(0, 0, 0), FontUzu.handle);
 	DrawFormatStringToHandle(150, 250,GetColor(0, 0, 0), FontUzu.handle, "%d", score);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
+
 	//タイトルへボタンを光らせる
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
