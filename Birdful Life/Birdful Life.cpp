@@ -1004,11 +1004,12 @@ VOID MY_PLAY_PROC(VOID)
 			{
 				esa[i].x -= 4;	//エサを左に動かす
 			}
-			else
-			{
-				int X_ichi = GetRand(20);
-				esa[i].x = (GAME_WIDTH + esa[i].width) * X_ichi;	//エサを右画面外にランダム配置
-			}
+			//else
+			//{
+			//	int X_ichi = GetRand(20);
+			//	
+			//	esa[i].x = GAME_WIDTH /*+ esa[i].width * X_ichi*/;	//エサを右画面外にランダム配置
+			//}
 
 			RECT EsaRect;
 			EsaRect.left = esa[i].x;
@@ -1021,7 +1022,9 @@ VOID MY_PLAY_PROC(VOID)
 				score += 50;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 				int X_ichi = GetRand(20);
-				esa[i].x = (GAME_WIDTH + esa[i].width) * X_ichi; //エサを右画面外にランダム配置
+				
+				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
+				
 			}
 		}
 
