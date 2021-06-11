@@ -45,6 +45,7 @@
 
 #define MUSIC_DAMAGE_PATH TEXT(".\\MUSIC\\damage1.mp3")						 //ダメージ効果音
 #define MUSIC_GET_PATH TEXT(".\\MUSIC\\score2.mp3")							 //エサをとったときの効果音
+#define MUSIC_LVUP_PATH TEXT(".\\MUSIC\\LveleUP.mp3")						//レベルアップしたときの効果音
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
@@ -233,6 +234,7 @@ MUSIC EndBGM;	//エンドBGM
 
 MUSIC GetSE;   //エサ取り効果音
 MUSIC DamageSE;    //ダメージ効果音
+MUSIC LvUPSE;    //ダメージ効果音
 
 //画像関連 ※名前の付け方はImageシーン名何の画像か;
 IMAGE ImageTitleRogo;				 //タイトルロゴ
@@ -930,11 +932,9 @@ VOID MY_PLAY_PROC(VOID)
 
 	}
 
-	playercount++; //プレイヤーアニメーション用のカウント
-
-
 	//プレイヤーの移動操作
 	player.speed = 5; //プレイヤーの速度を設定
+	playercount++; //プレイヤーアニメーション用のカウント
 	if (MY_KEY_DOWN(KEY_INPUT_SPACE) == TRUE) //SPACEを押していたら上昇
 	{
 		playercount += 1;
@@ -1021,7 +1021,7 @@ VOID MY_PLAY_PROC(VOID)
 			{
 				score += 50;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
-				int X_ichi = GetRand(20);
+				int X_ichi = GetRand(50);
 				
 				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
 				
@@ -1040,7 +1040,10 @@ VOID MY_PLAY_PROC(VOID)
 				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
 				{
 					/*mutekicount = 0;*/
-					IsMuteki = TRUE;	//一定時間、無敵状態になる
+					if (player.life > 1) //プレイヤーライフが１より大きかったら
+					{
+						IsMuteki = TRUE;	//一定時間、無敵状態になる
+					}					
 					player.life--;	//ライフを減らす
 					PlaySoundMem(DamageSE.handle, DX_PLAYTYPE_BACK);
 
@@ -1089,12 +1092,19 @@ VOID MY_PLAY_PROC(VOID)
 
 	}
 
-	if (score == 100)
+
+	//レベルアップ
+	if (score == 100) 
 	{
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
 			ImageRuleEx.IsDraw = TRUE;
+			if (Lvcount == 1)
+			{
+				ChangeVolumeSoundMem(GAME_SOUND_VOLUME, LvUPSE.handle);
+				PlaySoundMem(LvUPSE.handle, DX_PLAYTYPE_BACK);
+			}
 		}
 		else
 		{
@@ -1515,7 +1525,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	player.IsDraw = TRUE;
 
-
 	//カラス１
 	strcpy_s(karasu1.image.path, IMAGE_ENEMY_PATH);
 	karasu1.image.handle = LoadGraph(karasu1.image.path);
@@ -1668,7 +1677,7 @@ BOOL MY_LOAD_MUSIC(VOID)
 	GetSE.handle = LoadSoundMem(GetSE.path);
 	if (GetSE.handle == -1)
 	{
-		MessageBox(GetMainWindowHandle(), MUSIC_PLAY_BGM_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		MessageBox(GetMainWindowHandle(), MUSIC_GET_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
 
@@ -1680,6 +1689,17 @@ BOOL MY_LOAD_MUSIC(VOID)
 		MessageBox(GetMainWindowHandle(), MUSIC_DAMAGE_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
+
+
+	//レベルアップ時の効果音
+	strcpy_s(LvUPSE.path, MUSIC_LVUP_PATH);
+	LvUPSE.handle = LoadSoundMem(LvUPSE.path);
+	if (LvUPSE.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_LVUP_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
 
 	//エンドBGM
 	strcpy_s(EndBGM.path, MUSIC_END_BGM_PATH);
@@ -1702,6 +1722,7 @@ VOID MY_DELETE_MUSIC(VOID)
 	DeleteSoundMem(PlayBGM.handle);
 	DeleteSoundMem(GetSE.handle);
 	DeleteSoundMem(DamageSE.handle);
+	DeleteSoundMem(LvUPSE.handle);
 	DeleteSoundMem(EndBGM.handle);
 
 	return;
