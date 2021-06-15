@@ -66,12 +66,6 @@
 #define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_•â³‚ ‚è3.png")           //ƒ^ƒCƒgƒ‹”wŒi’‹3
 #define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_•â³‚ ‚è4.png")           //ƒ^ƒCƒgƒ‹”wŒi’‹4
 
-//”wŒi—[•ûver
-#define IMAGE_EVENING_BACK1_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_—[•û1.png")           //—[•û”wŒi1
-#define IMAGE_EVENING_BACK2_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_—[•û2.png")           //—[•û”wŒi2
-#define IMAGE_EVENING_BACK3_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_—[•û3.png")           //—[•û”wŒi3
-#define IMAGE_EVENING_BACK4_PATH    TEXT(".\\IMAGE\\”wŒi˜A‘±_—[•û4.png")           //—[•û”wŒi4
-
 #define IMAGE_TITLE_BACK_NUM	4	//”wŒi‰æ‘œ‚Ì–‡”
 
 
@@ -114,6 +108,13 @@ enum GAME_SCENE {
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END,
 };	//ƒQ[ƒ€‚ÌƒV[ƒ“
+
+enum GAME_LEVEL
+{
+	LEVEL_EASY,
+	LEVEL_NOMAL,
+	LEVEL_HARD,
+}; //ƒQ[ƒ€ƒŒƒxƒ‹
 
 //intŒ^‚ÌPOINT\‘¢‘Ì
 typedef struct STRUCT_I_POINT
@@ -188,7 +189,7 @@ typedef struct STRUCT_CHARA
 typedef struct STRUCT_IMAGE_BACK
 {
 	IMAGE image;		//IMAGE\‘¢‘Ì
-	BOOL IsDraw;		//”wŒi‚ğ•\¦‚Å‚«‚é‚©
+	BOOL IsDraw;		//’e‚ğ•\¦‚Å‚«‚é‚©
 }IMAGE_BACK;	//”wŒi‰æ‘œ‚Ì\‘¢‘Ì
 
 //########## ƒOƒ[ƒoƒ‹•Ï” ##########
@@ -207,6 +208,7 @@ MOUSE mouse;
 
 //ƒQ[ƒ€ŠÖ˜A
 int GameScene;		//ƒQ[ƒ€ƒV[ƒ“‚ğŠÇ—
+int GameLevel;      //ƒQ[ƒ€ƒŒƒxƒ‹‚ğŠÇ—
 
 //ƒLƒƒƒ‰ƒNƒ^[ŠÖ˜A
 CHARA player; 
@@ -223,6 +225,8 @@ int Lvcount;			//ƒŒƒxƒ‹ƒAƒbƒv‚Ì‰æ‘œ‚ğ•\¦‚·‚éŠÔ
 BOOL Ishit = TRUE;		//“–‚½‚è”»’è‚ª‚Â‚­‚©
 BOOL IsMuteki = FALSE;	//–³“Gó‘Ô‚É‚È‚Á‚Ä‚¢‚é‚©
 
+//“G¶¬ŠÖ˜A
+int enemykind;                          //“G‚Ìí—Ş
 int TekiCreateCnt = 0;					//“G‚ğì‚éŠÔŠu
 int TekiCreateCntMax = GAME_FPS * 5;	//“G‚ğì‚éŠÔŠu(MAX)
 
@@ -254,7 +258,6 @@ IMAGE ImageEndAbutton2;              //ƒGƒ“ƒh‚à‚¤ˆê‰ñƒ{ƒ^ƒ“2
 
 //”wŒiŠÖ˜A
 IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//ƒ^ƒCƒgƒ‹”wŒi
-IMAGE_BACK ImageEveningBack[IMAGE_TITLE_BACK_NUM];	//—[•û”wŒi
 IMAGE ImageEndBack1;                                //ƒGƒ“ƒh”wŒi‚Ğ‚Èƒpƒ^[ƒ“1
 IMAGE ImageEndBack2;                                //ƒGƒ“ƒh”wŒi‚Ğ‚Èƒpƒ^[ƒ“2
 IMAGE ImageEndBack3;                                //ƒGƒ“ƒh”wŒi‚Ğ‚Èƒpƒ^[ƒ“3
@@ -352,6 +355,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	GameScene = GAME_SCENE_START;	//ƒQ[ƒ€ƒV[ƒ“‚ÍƒXƒ^[ƒg‰æ–Ê‚©‚ç
+	GameLevel = LEVEL_EASY;         //ƒC[ƒW[‚©‚ç
 	SetDrawScreen(DX_SCREEN_BACK);	//DrawŒnŠÖ”‚Í— ‰æ–Ê‚É•`‰æ
 
 	//–³ŒÀƒ‹[ƒv
@@ -926,10 +930,18 @@ VOID MY_PLAY_PROC(VOID)
 			if (enemy[index].IsCreate == FALSE)
 			{
 				//ƒ‰ƒ“ƒ_ƒ€‚Å0,1‚ªo‚ê‚Î“G¶¬
-				int kind = GetRand(50);
-				if (2 > kind)
+				if (GameLevel == LEVEL_EASY)
 				{
-					switch (kind)
+					enemykind = GetRand(100);
+				}
+				else if (GameLevel == LEVEL_NOMAL)
+				{
+					enemykind = GetRand(50);
+				}
+				
+				if (2 > enemykind)
+				{
+					switch (enemykind)
 					{
 					case 0:
 						enemy[index] = karasu1;
@@ -1007,31 +1019,6 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//‰æ‘œ‚Ì•‚Q‚Â•ªA¶‚ÉˆÚ“®‚³‚¹‚é
 			ImageTitleBack[num].IsDraw = FALSE;								//‰æ‘œ‚ğ•`‰æ‚µ‚È‚¢
-		}
-	}
-
-
-	//—[•û‚Ì”wŒi‰æ‘œ‚ğ“®‚©‚·
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
-	{
-		//‰æ‘œ‚ğˆÚ“®‚³‚¹‚é
-		ImageEveningBack[num].image.x--;//‰E‚©‚ç¶‚É—¬‚ê‚é
-
-		//”wŒi‰æ‘œ‚ğ•`‰æ‚Å‚«‚È‚¢‚Æ‚«
-		if (ImageEveningBack[num].IsDraw == FALSE)
-		{
-			//”wŒi‰æ‘œ‚ª‰æ–Ê“à‚É‚¢‚é‚Æ‚«
-			if (ImageEveningBack[num].image.x + ImageEveningBack[num].image.width > 0)
-			{
-				ImageEveningBack[num].IsDraw = TRUE;	//‰æ‘œ‚ğ•`‰æ‚·‚é
-			}
-		}
-
-		//”wŒi‰æ‘œ‚ª‰æ–Ê‚ğ’Ê‚è‰z‚µ‚½‚Æ‚«
-		if (ImageEveningBack[num].image.x + ImageEveningBack[num].image.width < 0)
-		{
-			ImageEveningBack[num].image.x = ImageEveningBack[0].image.width * 3;	//‰æ‘œ‚Ì•‚Q‚Â•ªA¶‚ÉˆÚ“®‚³‚¹‚é
-			ImageEveningBack[num].IsDraw = FALSE;								//‰æ‘œ‚ğ•`‰æ‚µ‚È‚¢
 		}
 	}
 
@@ -1139,17 +1126,13 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//ƒŒƒxƒ‹ƒAƒbƒv
-	if (score >= 100) 
+	if (score == 500) 
 	{
-		for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
-		{
-			ImageTitleBack[num].IsDraw = FALSE;
-		}
-
+		GameLevel = LEVEL_NOMAL;
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
-			ImageRuleEx.IsDraw = TRUE;		
+			ImageRuleEx.IsDraw = TRUE;
 			if (Lvcount == 1)
 			{
 				ChangeVolumeSoundMem(GAME_SOUND_VOLUME, LvUPSE.handle);
@@ -1169,24 +1152,6 @@ VOID MY_PLAY_PROC(VOID)
 //ƒvƒŒƒC‰æ–Ê‚Ì•`‰æ
 VOID MY_PLAY_DRAW(VOID)
 {
-
-	//—[•û‚Ì”wŒi‚ğ•`‰æ‚·‚é
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
-	{
-		//•`‰æ‚Å‚«‚é‚Æ‚«‚ÍEEE
-		if (ImageEveningBack[num].IsDraw == TRUE)
-		{
-			//”wŒi‚ğ•`‰æ
-			DrawGraph(ImageEveningBack[num].image.x, ImageEveningBack[num].image.y, ImageEveningBack[num].image.handle, TRUE);
-
-			//yƒfƒoƒbƒO—pz”wŒi‰æ‘œ‚Ì”š‚ğƒeƒXƒg“I‚É•\¦
-			/*DrawFormatString(
-				ImageEveningBack[num].image.x,
-				ImageEveningBack[num].image.y,
-				GetColor(255, 0, 0), "”wŒi‰æ‘œF%d", num + 1);*/
-		}
-	}
-
 	//”wŒi‚ğ•`‰æ‚·‚é
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
@@ -1203,9 +1168,6 @@ VOID MY_PLAY_DRAW(VOID)
 				GetColor(255, 0, 0), "”wŒi‰æ‘œF%d", num + 1);*/
 		}
 	}
-
-
-	
 
 	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
@@ -1385,11 +1347,11 @@ VOID MY_END_DRAW(VOID)
 		}
 	}
 
-	SetFontSize(50);
 	DrawStringToHandle(80, 100, "ƒXƒRƒA", GetColor(0, 0, 0), FontUzu.handle);
 	DrawFormatStringToHandle(150, 250,GetColor(0, 0, 0), FontUzu.handle, "%d", score);
 	DrawGraph(ImageEndTbutton.x, ImageEndTbutton.y, ImageEndTbutton.handle, TRUE);
 	DrawGraph(ImageEndAbutton.x, ImageEndAbutton.y, ImageEndAbutton.handle, TRUE);
+
 	//ƒ^ƒCƒgƒ‹‚Öƒ{ƒ^ƒ“‚ğŒõ‚ç‚¹‚é
 	if (ImageEndTbutton2.IsDraw == TRUE)
 	{
@@ -1477,49 +1439,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleBack[3].image.x = ImageTitleBack[0].image.width * 3;	//‰æ‘œ‚Ì•3‚Â•ª‰E‚ÉˆÚ“®
 	ImageTitleBack[3].image.y = GAME_HEIGHT / 2 - ImageTitleBack[3].image.height / 2; 				//ã‰º’†‰›‘µ‚¦
 	ImageTitleBack[3].IsDraw = FALSE;
-
-
-
-	//ƒvƒŒƒC”wŒii—[•ûver)
-	strcpy_s(ImageEveningBack[0].image.path, IMAGE_EVENING_BACK1_PATH);			//ƒpƒX‚Ìİ’è
-	strcpy_s(ImageEveningBack[1].image.path, IMAGE_EVENING_BACK2_PATH);		//ƒpƒX‚Ìİ’è(”wŒi‰æ‘œ”½“])
-	strcpy_s(ImageEveningBack[2].image.path, IMAGE_EVENING_BACK3_PATH);			//ƒpƒX‚Ìİ’è
-	strcpy_s(ImageEveningBack[3].image.path, IMAGE_EVENING_BACK4_PATH);		//ƒpƒX‚Ìİ’è(”wŒi‰æ‘œ”½“])
-
-	//‰æ‘œ‚ğ˜A‘±‚µ‚Ä“Ç‚İ‚İ
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
-	{
-		ImageEveningBack[num].image.handle = LoadGraph(ImageEveningBack[num].image.path);	//“Ç‚İ‚İ
-		if (ImageEveningBack[num].image.handle == -1)
-		{
-			//ƒGƒ‰[ƒƒbƒZ[ƒW•\¦
-			MessageBox(GetMainWindowHandle(), IMAGE_EVENING_BACK1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-			return FALSE;
-		}
-		//‰æ‘œ‚Ì•‚Æ‚‚³‚ğæ“¾
-		GetGraphSize(ImageEveningBack[num].image.handle, &ImageEveningBack[num].image.width, &ImageEveningBack[num].image.height);
-	}
-	//”wŒi‰æ‘œ‡@‚Ìİ’è
-	ImageEveningBack[0].image.x = 0 - ImageEveningBack[0].image.width * 0;	//xŒ´“_
-	ImageEveningBack[0].image.y = GAME_HEIGHT / 2 - ImageEveningBack[0].image.height / 2; 				//ã‰º’†‰›‘µ‚¦
-	ImageEveningBack[0].IsDraw = FALSE;
-
-	//”wŒi‰æ‘œ‡A‚Ìİ’è
-	ImageEveningBack[1].image.x = ImageEveningBack[0].image.width * 1;	//‰æ‘œ‚Ì•1‚Â•ª‰E‚ÉˆÚ“®
-	ImageEveningBack[1].image.y = GAME_HEIGHT / 2 - ImageEveningBack[1].image.height / 2; 				//ã‰º’†‰›‘µ‚¦
-	ImageEveningBack[1].IsDraw = FALSE;
-
-	//”wŒi‰æ‘œ‡B‚Ìİ’è
-	ImageEveningBack[2].image.x = ImageEveningBack[0].image.width * 2;	//‰æ‘œ‚Ì•2‚Â•ª‰E‚ÉˆÚ“®
-	ImageEveningBack[2].image.y = GAME_HEIGHT / 2 - ImageEveningBack[2].image.height / 2; 				//ã‰º’†‰›‘µ‚¦
-	ImageEveningBack[2].IsDraw = FALSE;
-
-	//”wŒi‰æ‘œ‡B‚Ìİ’è
-	ImageEveningBack[3].image.x = ImageEveningBack[0].image.width * 3;	//‰æ‘œ‚Ì•3‚Â•ª‰E‚ÉˆÚ“®
-	ImageEveningBack[3].image.y = GAME_HEIGHT / 2 - ImageEveningBack[3].image.height / 2; 				//ã‰º’†‰›‘µ‚¦
-	ImageEveningBack[3].IsDraw = FALSE;
-
-
 
 	//ƒ‹[ƒ‹à–¾‰æ‘œ
 	strcpy_s(ImageRuleEx.path, IMAGE_RULE_EX_PATH);		    //ƒpƒX‚Ìİ’è
@@ -1724,10 +1643,6 @@ VOID MY_DELETE_IMAGE(VOID)
 	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
 	{
 		DeleteGraph(ImageTitleBack[0].image.handle);
-	}
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
-	{
-		DeleteGraph(ImageEveningBack[0].image.handle);
 	}
 	for (int i = 0; i < LIFE_MAX; i++)
 	{
