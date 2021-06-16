@@ -1225,7 +1225,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-	DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
+	//DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
 
 	//ƒGƒT‚ð•`‰æ
