@@ -66,7 +66,13 @@
 #define IMAGE_TITLE_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_補正あり3.png")           //タイトル背景昼3
 #define IMAGE_TITLE_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_補正あり4.png")           //タイトル背景昼4
 
-#define IMAGE_TITLE_BACK_NUM	4	//背景画像の枚数
+#define IMAGE_EVENING_BACK1_PATH    TEXT(".\\IMAGE\\背景連続_夕方1.png")           //タイトル背景昼1
+#define IMAGE_EVENING_BACK2_PATH    TEXT(".\\IMAGE\\背景連続_夕方2.png")           //タイトル背景昼2
+#define IMAGE_EVENING_BACK3_PATH    TEXT(".\\IMAGE\\背景連続_夕方3.png")           //タイトル背景昼3
+#define IMAGE_EVENING_BACK4_PATH    TEXT(".\\IMAGE\\背景連続_夕方4.png")           //タイトル背景昼4
+
+
+#define IMAGE_BACK_NUM	4	//背景画像の枚数
 
 
 
@@ -257,10 +263,13 @@ IMAGE ImageEndTbutton2;              //エンドタイトルへボタン2
 IMAGE ImageEndAbutton2;              //エンドもう一回ボタン2
 
 //背景関連
-IMAGE_BACK ImageTitleBack[IMAGE_TITLE_BACK_NUM];	//タイトル背景
+IMAGE_BACK ImageTitleBack[IMAGE_BACK_NUM];	//タイトル背景
+IMAGE_BACK ImageEveningBack[IMAGE_BACK_NUM];	//夕方背景
 IMAGE ImageEndBack1;                                //エンド背景ひなパターン1
 IMAGE ImageEndBack2;                                //エンド背景ひなパターン2
 IMAGE ImageEndBack3;                                //エンド背景ひなパターン3
+
+
 
 //フォント関連
 FONT FontUzu;
@@ -714,7 +723,7 @@ VOID MY_START_PROC(VOID)
 
 
 	//背景画像を動かす
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		//画像を移動させる
 		ImageTitleBack[num].image.x--;//右から左に流れる
@@ -744,7 +753,7 @@ VOID MY_START_PROC(VOID)
 VOID MY_START_DRAW(VOID)
 {
 	//背景を描画する
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		//描画できるときは・・・
 		if (ImageTitleBack[num].IsDraw == TRUE)
@@ -800,7 +809,7 @@ VOID MY_RULE_PROC(VOID)
 		return;
 	}
 	//背景画像を動かす
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		//画像を移動させる
 		ImageTitleBack[num].image.x--;//右から左に流れる
@@ -829,7 +838,7 @@ VOID MY_RULE_PROC(VOID)
 VOID MY_RULE_DRAW(VOID)
 {
 	// 背景を描画する
-		for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+		for (int num = 0; num < IMAGE_BACK_NUM; num++)
 		{
 			//描画できるときは・・・
 			if (ImageTitleBack[num].IsDraw == TRUE)
@@ -999,7 +1008,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//背景画像を動かす
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		//画像を移動させる
 		ImageTitleBack[num].image.x--;//右から左に流れる
@@ -1019,6 +1028,31 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅２つ分、左に移動させる
 			ImageTitleBack[num].IsDraw = FALSE;								//画像を描画しない
+		}
+	}
+
+
+	//夕方背景画像を動かす
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
+	{
+		//画像を移動させる
+		ImageEveningBack[num].image.x--;//右から左に流れる
+
+		//背景画像を描画できないとき
+		if (ImageEveningBack[num].IsDraw == FALSE)
+		{
+			//背景画像が画面内にいるとき
+			if (ImageEveningBack[num].image.x + ImageEveningBack[num].image.width > 0)
+			{
+				ImageEveningBack[num].IsDraw = TRUE;	//画像を描画する
+			}
+		}
+
+		//背景画像が画面を通り越したとき
+		if (ImageEveningBack[num].image.x + ImageEveningBack[num].image.width < 0)
+		{
+			ImageEveningBack[num].image.x = ImageEveningBack[0].image.width * 3;	//画像の幅２つ分、左に移動させる
+			ImageEveningBack[num].IsDraw = FALSE;								//画像を描画しない
 		}
 	}
 
@@ -1126,8 +1160,12 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//レベルアップ
-	if (score == 500) 
+	if (score >= 500) 
 	{
+		for (int num = 0; num < IMAGE_BACK_NUM; num++)
+		{
+			ImageTitleBack[num].IsDraw = FALSE;
+		}
 		GameLevel = LEVEL_NOMAL;
 		if (Lvcount <= 100)
 		{
@@ -1152,8 +1190,26 @@ VOID MY_PLAY_PROC(VOID)
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
+	//夕方背景を描画する
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
+	{
+		//描画できるときは・・・
+		if (ImageEveningBack[num].IsDraw == TRUE)
+		{
+			//背景を描画
+			DrawGraph(ImageEveningBack[num].image.x, ImageEveningBack[num].image.y, ImageEveningBack[num].image.handle, TRUE);
+
+			//【デバッグ用】背景画像の数字をテスト的に表示
+			/*DrawFormatString(
+				ImageEveningBack[num].image.x,
+				ImageEveningBack[num].image.y,
+				GetColor(255, 0, 0), "背景画像：%d", num + 1);*/
+		}
+	}
+
+
 	//背景を描画する
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		//描画できるときは・・・
 		if (ImageTitleBack[num].IsDraw == TRUE)
@@ -1408,7 +1464,7 @@ BOOL MY_LOAD_IMAGE(VOID)
 	strcpy_s(ImageTitleBack[3].image.path, IMAGE_TITLE_BACK4_PATH);		//パスの設定(背景画像反転)
 
 	//画像を連続して読み込み
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		ImageTitleBack[num].image.handle = LoadGraph(ImageTitleBack[num].image.path);	//読み込み
 		if (ImageTitleBack[num].image.handle == -1)
@@ -1439,6 +1495,49 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageTitleBack[3].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅3つ分右に移動
 	ImageTitleBack[3].image.y = GAME_HEIGHT / 2 - ImageTitleBack[3].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[3].IsDraw = FALSE;
+
+
+
+	//夕方背景
+	strcpy_s(ImageEveningBack[0].image.path, IMAGE_EVENING_BACK1_PATH);			//パスの設定
+	strcpy_s(ImageEveningBack[1].image.path, IMAGE_EVENING_BACK2_PATH);		//パスの設定(背景画像反転)
+	strcpy_s(ImageEveningBack[2].image.path, IMAGE_EVENING_BACK3_PATH);			//パスの設定
+	strcpy_s(ImageEveningBack[3].image.path, IMAGE_EVENING_BACK4_PATH);		//パスの設定(背景画像反転)
+
+	//画像を連続して読み込み
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
+	{
+		ImageEveningBack[num].image.handle = LoadGraph(ImageEveningBack[num].image.path);	//読み込み
+		if (ImageEveningBack[num].image.handle == -1)
+		{
+			//エラーメッセージ表示
+			MessageBox(GetMainWindowHandle(), IMAGE_EVENING_BACK1_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+			return FALSE;
+		}
+		//画像の幅と高さを取得
+		GetGraphSize(ImageEveningBack[num].image.handle, &ImageEveningBack[num].image.width, &ImageEveningBack[num].image.height);
+	}
+	//背景画像①の設定
+	ImageEveningBack[0].image.x = 0 - ImageEveningBack[0].image.width * 0;	//x原点
+	ImageEveningBack[0].image.y = GAME_HEIGHT / 2 - ImageEveningBack[0].image.height / 2; 				//上下中央揃え
+	ImageEveningBack[0].IsDraw = FALSE;
+
+	//背景画像②の設定
+	ImageEveningBack[1].image.x = ImageEveningBack[0].image.width * 1;	//画像の幅1つ分右に移動
+	ImageEveningBack[1].image.y = GAME_HEIGHT / 2 - ImageEveningBack[1].image.height / 2; 				//上下中央揃え
+	ImageEveningBack[1].IsDraw = FALSE;
+
+	//背景画像③の設定
+	ImageEveningBack[2].image.x = ImageEveningBack[0].image.width * 2;	//画像の幅2つ分右に移動
+	ImageEveningBack[2].image.y = GAME_HEIGHT / 2 - ImageEveningBack[2].image.height / 2; 				//上下中央揃え
+	ImageEveningBack[2].IsDraw = FALSE;
+
+	//背景画像③の設定
+	ImageEveningBack[3].image.x = ImageEveningBack[0].image.width * 3;	//画像の幅3つ分右に移動
+	ImageEveningBack[3].image.y = GAME_HEIGHT / 2 - ImageEveningBack[3].image.height / 2; 				//上下中央揃え
+	ImageEveningBack[3].IsDraw = FALSE;
+
+
 
 	//ルール説明画像
 	strcpy_s(ImageRuleEx.path, IMAGE_RULE_EX_PATH);		    //パスの設定
@@ -1640,9 +1739,13 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageEndTbutton2.handle);
 	DeleteGraph(ImageEndAbutton2.handle);
 
-	for (int num = 0; num < IMAGE_TITLE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		DeleteGraph(ImageTitleBack[0].image.handle);
+	}
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
+	{
+		DeleteGraph(ImageEveningBack[0].image.handle);
 	}
 	for (int i = 0; i < LIFE_MAX; i++)
 	{
