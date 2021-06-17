@@ -227,7 +227,9 @@ int playercount; //プレイヤーのアニメーション用カウント
 int mutekicount;	//無敵時間を測るカウント
 int tennmetu;		//点滅時間を測るカウント
 int Lvcount;			//レベルアップの画像を表示する時間
+int WordCount;      //文字を出し続ける時間
 
+BOOL SCORE_WORD = FALSE; //文字が出るか
 BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
@@ -240,6 +242,7 @@ int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 IMAGE esa[ESA_MAX];
 IMAGE heart[LIFE_MAX];
 int score = 0;
+int EsaScore = 50;
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -902,6 +905,8 @@ VOID MY_PLAY_INIT(VOID)
 	//レベルアップ画像の表示カウントの初期化
 	Lvcount = 0;
 
+	WordCount = 0;
+
 	//レベルを戻す
 	GameLevel = LEVEL_EASY;
 
@@ -1089,8 +1094,9 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
-				score += 50;
+				score += EsaScore;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
+				SCORE_WORD = TRUE;
 				int X_ichi = GetRand(50);
 				
 				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
@@ -1282,8 +1288,7 @@ VOID MY_PLAY_DRAW(VOID)
 
 
 	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
-	DrawBox(PlayerRect.left, PlayerRect.top, PlayerRect.right, PlayerRect.bottom, GetColor(255, 0, 0), FALSE);
-
+	
 	if (ImageRuleEx.IsDraw == TRUE)
 	{
 		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
@@ -1308,6 +1313,19 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
+	if (SCORE_WORD == TRUE)
+	{
+		if (WordCount <= 20)
+		{
+			WordCount++;
+			DrawFormatStringToHandle(player.width, player.y - 80, GetColor(0, 0, 0), FontUzu.handle, "+%d", EsaScore);
+		}
+		else
+		{
+			SCORE_WORD = FALSE;
+			WordCount = 0;
+		}
+	}
 
 	return;
 }
