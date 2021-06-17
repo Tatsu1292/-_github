@@ -665,7 +665,7 @@ BOOL MY_FONT_CREATE(VOID)
 	FontUzu.handle = -1;
 	FontUzu.size = 100;
 	FontUzu.bold = 1;
-	FontUzu.type = DX_FONTTYPE_ANTIALIASING_EDGE;
+	FontUzu.type = DX_FONTTYPE_ANTIALIASING;
 
 	FontUzu.handle = CreateFontToHandle(FontUzu.name, FontUzu.size, FontUzu.bold, FontUzu.type);
 	if (FontUzu.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_UZU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
@@ -876,7 +876,7 @@ VOID MY_PLAY_INIT(VOID)
 		esa[i].x = (GAME_WIDTH + esa[i].width * i * 10);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
-		int ichi = GetRand(GAME_HEIGHT - esa[i].height);
+		int ichi = 100 + GetRand(GAME_HEIGHT  - esa[i].height - 100);
 
 		esa[i].y = ichi;
 
@@ -902,6 +902,9 @@ VOID MY_PLAY_INIT(VOID)
 	//レベルアップ画像の表示カウントの初期化
 	Lvcount = 0;
 
+	//レベルを戻す
+	GameLevel = LEVEL_EASY;
+
 	return;
 }
 
@@ -911,7 +914,7 @@ VOID MY_PLAY(VOID)
 	MY_PLAY_PROC();	//プレイ画面の処理
 	MY_PLAY_DRAW();	//プレイ画面の描画
 
-	DrawString(0, 0, "プレイ画面(カラスに当たったら負け)", GetColor(0, 0, 0));
+	//DrawString(0, 0, "プレイ画面(カラスに当たったら負け)", GetColor(0, 0, 0));
 	return;
 }
 
@@ -945,7 +948,7 @@ VOID MY_PLAY_PROC(VOID)
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(50);
+					enemykind = GetRand(30);
 				}
 				
 				if (2 > enemykind)
@@ -962,7 +965,7 @@ VOID MY_PLAY_PROC(VOID)
 					}
 
 					enemy[index].image.x = GAME_WIDTH + index * (+100);	
-					enemy[index].image.y = GetRand(GAME_HEIGHT - enemy[index].image.height);	//敵の出現Y位置をランダム
+					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
 					/*EnemyAtari(&enemy[index]);*/
 
@@ -987,7 +990,7 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 	//画面外にプレイヤーが行かないようにする
-	if (player.y < 0) { player.y = 0; }
+	if (player.y < 100) { player.y = 100; }
 	if (player.y + player.height > GAME_HEIGHT) { player.y = GAME_HEIGHT - player.height; }
 
 
@@ -1058,11 +1061,12 @@ VOID MY_PLAY_PROC(VOID)
 
 
 		RECT PlayerRect;
-		PlayerRect.left = player.x;
-		PlayerRect.top = player.y;
-		PlayerRect.right = player.x + player.width;
-		PlayerRect.bottom = player.y + player.height;
+		PlayerRect.left = player.x + 5;
+		PlayerRect.top = player.y + 5;
+		PlayerRect.right = player.x + player.width - 5;
+		PlayerRect.bottom = player.y + player.height - 5;
 
+		
 		for (int i = 0; i < ESA_MAX; i++)
 		{
 			
@@ -1226,7 +1230,7 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 	//DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
-	DrawFormatString(700, 0, GetColor(255, 0, 0), "SCORE:%d", score);
+	DrawFormatStringToHandle(0, 0, GetColor(180, 255, 0),FontUzu.handle, "SCORE:%d", score);
 
 	//エサを描画
 	for (int i = 0; i < ESA_MAX; i++)
@@ -1278,6 +1282,7 @@ VOID MY_PLAY_DRAW(VOID)
 
 
 	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
+	DrawBox(PlayerRect.left, PlayerRect.top, PlayerRect.right, PlayerRect.bottom, GetColor(255, 0, 0), FALSE);
 
 	if (ImageRuleEx.IsDraw == TRUE)
 	{
@@ -1734,6 +1739,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 VOID MY_DELETE_IMAGE(VOID)
 {
 	DeleteGraph(ImageEndBack1.handle);
+	DeleteGraph(ImageEndBack2.handle);
+	DeleteGraph(ImageEndBack3.handle);
 	DeleteGraph(ImageEndTbutton.handle);
 	DeleteGraph(ImageEndAbutton.handle);
 	DeleteGraph(ImageEndTbutton2.handle);
@@ -1863,7 +1870,7 @@ VOID MY_DELETE_MUSIC(VOID)
 	return;
 }
 
-
+//日本語かどうか判断
 int isJapanese(unsigned char code)
 {
 	if ((code >= 0x81 && code <= 0x9F) ||
