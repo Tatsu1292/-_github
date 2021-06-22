@@ -80,7 +80,7 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 #define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
 #define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
-#define ENEMY_NUM				30    //　敵のＭＡＸ値
+#define ENEMY_NUM				10    //　敵のＭＡＸ値
 
 
 //アイテム
@@ -236,7 +236,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 //敵生成関連
 int enemykind;                          //敵の種類
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 10;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -276,6 +276,7 @@ IMAGE ImageEndBack3;                                //エンド背景ひなパターン3
 
 //フォント関連
 FONT FontUzu;
+FONT FontUzu2;
 
 //ひなセリフ関連
 char message[MESSAGE_MAX_LENGTH * MESSAGE_MAX_LINE];        //表示したいメッセージ
@@ -673,6 +674,16 @@ BOOL MY_FONT_CREATE(VOID)
 	FontUzu.handle = CreateFontToHandle(FontUzu.name, FontUzu.size, FontUzu.bold, FontUzu.type);
 	if (FontUzu.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_UZU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
 
+	strcpy_s(FontUzu2.path, sizeof(FontUzu2.path), FONT_UZU_PATH);
+	strcpy_s(FontUzu2.name, sizeof(FontUzu2.name), FONT_UZU_NAME);
+	FontUzu2.handle = -1;
+	FontUzu2.size = 50;
+	FontUzu2.bold = 1;
+	FontUzu2.type = DX_FONTTYPE_ANTIALIASING;
+
+	FontUzu2.handle = CreateFontToHandle(FontUzu2.name, FontUzu2.size, FontUzu2.bold, FontUzu2.type);
+	if (FontUzu2.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_UZU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
+
 	return TRUE;
 }
 
@@ -905,10 +916,14 @@ VOID MY_PLAY_INIT(VOID)
 	//レベルアップ画像の表示カウントの初期化
 	Lvcount = 0;
 
+	//スコア演出の初期化
+	SCORE_WORD = FALSE;
 	WordCount = 0;
 
 	//レベルを戻す
 	GameLevel = LEVEL_EASY;
+
+	TekiCreateCnt = 0;	//カウンタ初期化
 
 	return;
 }
@@ -949,11 +964,11 @@ VOID MY_PLAY_PROC(VOID)
 				//ランダムで0,1が出れば敵生成
 				if (GameLevel == LEVEL_EASY)
 				{
-					enemykind = GetRand(100);
+					enemykind = GetRand(30);
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(30);
+					enemykind = GetRand(10);
 				}
 				
 				if (2 > enemykind)
@@ -1007,6 +1022,12 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			StopSoundMem(PlayBGM.handle); //止める
 		}
+
+		for (int i = 0; i < ENEMY_NUM; i++)
+		{
+			enemy[i].IsCreate == FALSE;
+		}
+
 
 		//ゲームのシーンをエンド画面にする
 		GameScene = GAME_SCENE_END;
@@ -1092,16 +1113,24 @@ VOID MY_PLAY_PROC(VOID)
 			EsaRect.right = esa[i].x + esa[i].width;
 			EsaRect.bottom = esa[i].y + esa[i].height;
 
+			if (esa[i].x + esa[i].width < 0)
+			{
+				int X_ichi = GetRand(50);
+
+				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
+			}
+
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
 			{
 				score += EsaScore;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 				SCORE_WORD = TRUE;
 				int X_ichi = GetRand(50);
-				
-				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
-				
+
+				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配
 			}
+
+			
 		}
 
 		//プレイ画面での敵の構造
@@ -1257,6 +1286,7 @@ VOID MY_PLAY_DRAW(VOID)
 		if (enemy[i].image.x + enemy[i].image.width <= 0)
 		{
 			enemy[i].image.IsDraw = FALSE;
+			enemy[i].image.x = GAME_WIDTH + i * 100;
 		}
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
@@ -1318,7 +1348,7 @@ VOID MY_PLAY_DRAW(VOID)
 		if (WordCount <= 20)
 		{
 			WordCount++;
-			DrawFormatStringToHandle(player.width, player.y - 80, GetColor(0, 0, 0), FontUzu.handle, "+%d", EsaScore);
+			DrawFormatStringToHandle(player.x + player.width / 2, player.y - 25, GetColor(0, 0, 0), FontUzu2.handle, "+%d", EsaScore);
 		}
 		else
 		{
@@ -1500,22 +1530,22 @@ BOOL MY_LOAD_IMAGE(VOID)
 		GetGraphSize(ImageTitleBack[num].image.handle, &ImageTitleBack[num].image.width, &ImageTitleBack[num].image.height);
 	}
 	//背景画像①の設定
-	ImageTitleBack[0].image.x = 0 - ImageTitleBack[0].image.width * 0;	//x原点
+	ImageTitleBack[0].image.x = 0 - ImageTitleBack[0].image.width * 0 + 1;	//x原点
 	ImageTitleBack[0].image.y = GAME_HEIGHT / 2 - ImageTitleBack[0].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[0].IsDraw = FALSE;
 
 	//背景画像②の設定
-	ImageTitleBack[1].image.x = ImageTitleBack[0].image.width * 1;	//画像の幅1つ分右に移動
+	ImageTitleBack[1].image.x = ImageTitleBack[0].image.width * 1 + 1;	//画像の幅1つ分右に移動
 	ImageTitleBack[1].image.y = GAME_HEIGHT / 2 - ImageTitleBack[1].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[1].IsDraw = FALSE;
 
 	//背景画像③の設定
-	ImageTitleBack[2].image.x = ImageTitleBack[0].image.width * 2;	//画像の幅2つ分右に移動
+	ImageTitleBack[2].image.x = ImageTitleBack[0].image.width * 2 + 1;	//画像の幅2つ分右に移動
 	ImageTitleBack[2].image.y = GAME_HEIGHT / 2 - ImageTitleBack[2].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[2].IsDraw = FALSE;
 
 	//背景画像③の設定
-	ImageTitleBack[3].image.x = ImageTitleBack[0].image.width * 3;	//画像の幅3つ分右に移動
+	ImageTitleBack[3].image.x = ImageTitleBack[0].image.width * 3 + 1;	//画像の幅3つ分右に移動
 	ImageTitleBack[3].image.y = GAME_HEIGHT / 2 - ImageTitleBack[3].image.height / 2; 				//上下中央揃え
 	ImageTitleBack[3].IsDraw = FALSE;
 
