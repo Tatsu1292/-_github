@@ -50,7 +50,7 @@
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
-#define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン2
+#define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
 #define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\タイトルにもどるボタン暗.png")            //エンド　タイトルへボタン
 #define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\もういちど遊ぶボタン暗.png")            //エンド　もう一回ボタン
@@ -1444,7 +1444,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack2.x, ImageEndBack2.y, ImageEndBack2.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-		    setMessage("こんにちは");
+		    setMessage("おいしかった");
 		}
 	}
 	else if (1000 <= score)
