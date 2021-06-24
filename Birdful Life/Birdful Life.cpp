@@ -1087,10 +1087,10 @@ VOID MY_PLAY_PROC(VOID)
 
 
 		RECT PlayerRect;
-		PlayerRect.left = player.x + 5;
-		PlayerRect.top = player.y + 5;
-		PlayerRect.right = player.x + player.width - 5;
-		PlayerRect.bottom = player.y + player.height - 5;
+		PlayerRect.left = player.x + 7;
+		PlayerRect.top = player.y + 30;
+		PlayerRect.right = player.x + player.width;
+		PlayerRect.bottom = player.y + player.height;
 
 		
 		for (int i = 0; i < ESA_MAX; i++)
@@ -1274,15 +1274,13 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(esa[i].x, esa[i].y, esa[i].handle, TRUE);
 		}
-		//DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
+		DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
 	}
 
 
 	//敵の描画
 	for (int i = 0; i < ENEMY_NUM; i++)
 	{
-		//DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
-
 		if (enemy[i].image.x + enemy[i].image.width <= 0)
 		{
 			enemy[i].image.IsDraw = FALSE;
@@ -1297,6 +1295,8 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(enemy[i].image.x, enemy[i].image.y, enemy[i].image.handle, TRUE);
 		}
+		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
+
 	}
 
 
@@ -1315,9 +1315,9 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		DrawGraph(player.x, player.y, player.handle[a], TRUE);
 	}
+	DrawBox(player.x + 7, player.y + 30, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);
 
 
-	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
 	
 	if (ImageRuleEx.IsDraw == TRUE)
 	{
@@ -2045,9 +2045,10 @@ VOID setMessage(const char* ms)  //描画したいメッセージをセット
 VOID EnemyAtari(CHARA* e)
 {
 	e->rect.left = e->image.x;
-	e->rect.top = e->image.y;
+	e->rect.top = e->image.y + 30;
 	e->rect.right = e->image.x + e->image.width;
-	e->rect.bottom = e->image.y + e->image.height;
+	e->rect.bottom = e->image.y + e->image.height - 20;
+
 
 	return;
 }
