@@ -82,7 +82,7 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 #define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
 #define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
-#define ENEMY_NUM				10    //　敵のＭＡＸ値
+#define ENEMY_NUM				5    //　敵のＭＡＸ値
 
 
 //アイテム
@@ -238,7 +238,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 //敵生成関連
 int enemykind;                          //敵の種類
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 10;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -719,7 +719,7 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(TitleBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
 	}
 
-	//エンターキーを押したら、プレイシーンへ移動する
+	//エンターキーを押したら、ルール説明シーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		//BGM停止
@@ -730,8 +730,6 @@ VOID MY_START_PROC(VOID)
 
 		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, TitleSE.handle);//SEの音量調整
 		PlaySoundMem(TitleSE.handle, DX_PLAYTYPE_BACK);//SEを鳴らす
-
-		MY_PLAY_INIT();	//ゲーム初期化
 
 		//ゲームのシーンをプレイ画面にする
 		GameScene = GAME_SCENE_RULE;
@@ -954,11 +952,11 @@ VOID MY_PLAY_PROC(VOID)
 				//ランダムで0,1が出れば敵生成
 				if (GameLevel == LEVEL_EASY)
 				{
-					enemykind = GetRand(30);
+					enemykind = GetRand(10);
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(10);
+					enemykind = GetRand(5);
 				}
 				
 				if (2 > enemykind)
@@ -977,7 +975,7 @@ VOID MY_PLAY_PROC(VOID)
 					enemy[index].image.x = GAME_WIDTH + index * 10;	
 					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
-					/*EnemyAtari(&enemy[index]);*/
+					//EnemyAtari(&enemy[index]);
 
 					enemy[index].IsCreate = TRUE;
 				}
@@ -1126,12 +1124,13 @@ VOID MY_PLAY_PROC(VOID)
 		//プレイ画面での敵の構造
 		for (int i = 0; i < ENEMY_NUM; i++)
 		{
-			enemy[i].image.x -= enemy[i].speed;
-
-			EnemyAtari(&enemy[i]);
-
+			
 			if (enemy[i].image.IsDraw == TRUE)
 			{
+				enemy[i].image.x -= enemy[i].speed;
+
+				EnemyAtari(&enemy[i]);
+
 				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
 				{
 					/*mutekicount = 0;*/
@@ -1382,7 +1381,6 @@ VOID MY_END_PROC(VOID)
 				StopSoundMem(EndBGM.handle); //止める
 			}
 
-			MY_PLAY_INIT();
 			GameScene = GAME_SCENE_START;
 		}
 	}
@@ -1397,7 +1395,6 @@ VOID MY_END_PROC(VOID)
 				StopSoundMem(EndBGM.handle); //止める
 			}
 
-			MY_PLAY_INIT();
 			GameScene = GAME_SCENE_RULE;
 		}
 	}
