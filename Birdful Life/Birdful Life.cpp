@@ -26,7 +26,7 @@
 
 //音量
 #define GAME_SOUND_VOLUME_PER	30	//音声全部の音量を30%程度にする
-#define GAME_SOUND_VOLUME	255*GAME_SOUND_VOLUME_PER/100	//↑の割合の音量
+#define GAME_SOUND_VOLUME	255 * GAME_SOUND_VOLUME_PER/100	//↑の割合の音量
 
 //フォント
 #define FONT_UZU_PATH			TEXT(".\\FONT\\uzura.ttf")	     //フォントの場所
@@ -48,7 +48,9 @@
 #define MUSIC_LVUP_PATH TEXT(".\\MUSIC\\LveleUP.mp3")						//レベルアップしたときの効果音
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
-#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\LevelUP_rogo.png")         //ルール説明画像
+#define IMAGE_PLAY_LEVELUP_PATH  TEXT(".\\IMAGE\\LevelUP_rogo.png")         //レベルアップ画像
+#define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\背景_ぼかし.png")          //ルール説明画面背景
+#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明.png")           //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
@@ -195,7 +197,7 @@ typedef struct STRUCT_CHARA
 typedef struct STRUCT_IMAGE_BACK
 {
 	IMAGE image;		//IMAGE構造体
-	BOOL IsDraw;		//弾を表示できるか
+	BOOL IsDraw;		//表示できるか
 }IMAGE_BACK;	//背景画像の構造体
 
 //########## グローバル変数 ##########
@@ -259,6 +261,7 @@ MUSIC LvUPSE;    //ダメージ効果音
 IMAGE ImageTitleRogo;				 //タイトルロゴ
 IMAGE ImageTitlePush;				 //PUSH_TO_ENTERロゴ
 
+IMAGE ImagePlayLevelup;              //レベルアップ画像
 IMAGE ImageRuleEx;                   //ルール説明画像
 IMAGE ImageEndTbutton;               //エンドタイトルへボタン
 IMAGE ImageEndAbutton;               //エンドもう一回ボタン
@@ -267,6 +270,7 @@ IMAGE ImageEndAbutton2;              //エンドもう一回ボタン2
 
 //背景関連
 IMAGE_BACK ImageTitleBack[IMAGE_BACK_NUM];	//タイトル背景
+IMAGE ImageRuleBack;                                //ルール説明背景
 IMAGE_BACK ImageEveningBack[IMAGE_BACK_NUM];	//夕方背景
 IMAGE ImageEndBack1;                                //エンド背景ひなパターン1
 IMAGE ImageEndBack2;                                //エンド背景ひなパターン2
@@ -851,24 +855,10 @@ VOID MY_RULE_PROC(VOID)
 
 VOID MY_RULE_DRAW(VOID)
 {
-	// 背景を描画する
-		for (int num = 0; num < IMAGE_BACK_NUM; num++)
-		{
-			//描画できるときは・・・
-			if (ImageTitleBack[num].IsDraw == TRUE)
-			{
-				//背景を描画
-				DrawGraph(ImageTitleBack[num].image.x, ImageTitleBack[num].image.y, ImageTitleBack[num].image.handle, TRUE);
 
-				//【デバッグ用】背景画像の数字をテスト的に表示
-				/*DrawFormatString(
-					ImageTitleBack[num].image.x,
-					ImageTitleBack[num].image.y,
-					GetColor(255, 0, 0), "背景画像：%d", num + 1);*/
-			}
-		}
-
-		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
+	DrawGraph(ImageRuleBack.x, ImageRuleBack.y, ImageRuleBack.handle, TRUE);
+	DrawStringToHandle(GAME_WIDTH / 2, GAME_HEIGHT - FontUzu.size, "Start with Space",FontUzu.handle , GetColor(0,0,0), TRUE);
+	DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
 	
 	return;
 }
@@ -984,7 +974,7 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH + index * (+100);	
+					enemy[index].image.x = GAME_WIDTH + index * 10;	
 					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
 					/*EnemyAtari(&enemy[index]);*/
@@ -1025,7 +1015,7 @@ VOID MY_PLAY_PROC(VOID)
 
 		for (int i = 0; i < ENEMY_NUM; i++)
 		{
-			enemy[i].IsCreate == FALSE;
+			enemy[i].IsCreate = FALSE;
 		}
 
 
@@ -1286,12 +1276,13 @@ VOID MY_PLAY_DRAW(VOID)
 		if (enemy[i].image.x + enemy[i].image.width <= 0)
 		{
 			enemy[i].image.IsDraw = FALSE;
+			enemy[i].IsCreate = FALSE;
 			enemy[i].image.x = GAME_WIDTH + i * 100;
-		}
+		}/*
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
 			enemy[i].image.IsDraw = TRUE;
-		}
+		}*/
 
 		if (enemy[i].image.IsDraw == TRUE)
 		{
@@ -1319,9 +1310,9 @@ VOID MY_PLAY_DRAW(VOID)
 
 	//DrawBox(player.x, player.y, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);	
 	
-	if (ImageRuleEx.IsDraw == TRUE)
+	if (ImagePlayLevelup.IsDraw == TRUE)
 	{
-		DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
+		DrawGraph(ImagePlayLevelup.x, ImagePlayLevelup.y, ImagePlayLevelup.handle, TRUE);
 	}
 
 
@@ -1590,6 +1581,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageEveningBack[3].image.y = GAME_HEIGHT / 2 - ImageEveningBack[3].image.height / 2; 				//上下中央揃え
 	ImageEveningBack[3].IsDraw = FALSE;
 
+	//ルール説明背景画像
+	strcpy_s(ImageRuleBack.path, IMAGE_RULE_BACK_PATH);		    //パスの設定
+	ImageRuleBack.handle = LoadGraph(ImageRuleBack.path);	    //読み込み
+	if (ImageRuleBack.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_RULE_BACK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageRuleBack.handle, &ImageRuleBack.width, &ImageRuleBack.height);	//画像の幅と高さを取得
+	ImageRuleBack.x = GAME_WIDTH / 2 - ImageRuleBack.width / 2;		                    //左右中央揃え
+	ImageRuleBack.y = GAME_HEIGHT / 2 - ImageRuleBack.height / 2;	                    //上下中央揃え
 
 
 	//ルール説明画像
@@ -1604,7 +1607,21 @@ BOOL MY_LOAD_IMAGE(VOID)
 	GetGraphSize(ImageRuleEx.handle, &ImageRuleEx.width, &ImageRuleEx.height);	//画像の幅と高さを取得
 	ImageRuleEx.x = GAME_WIDTH / 2 - ImageRuleEx.width / 2;		                    //左右中央揃え
 	ImageRuleEx.y = GAME_HEIGHT / 2 - ImageRuleEx.height / 2;	                    //上下中央揃え
-	ImageRuleEx.IsDraw = FALSE;
+	
+
+	//レベルアップ画像
+	strcpy_s(ImagePlayLevelup.path, IMAGE_PLAY_LEVELUP_PATH);		    //パスの設定
+	ImagePlayLevelup.handle = LoadGraph(ImagePlayLevelup.path);	    //読み込み
+	if (ImagePlayLevelup.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_PLAY_LEVELUP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImagePlayLevelup.handle, &ImagePlayLevelup.width, &ImagePlayLevelup.height);	//画像の幅と高さを取得
+	ImagePlayLevelup.x = GAME_WIDTH / 2 - ImagePlayLevelup.width / 2;		                    //左右中央揃え
+	ImagePlayLevelup.y = GAME_HEIGHT / 2 - ImagePlayLevelup.height / 2;	                    //上下中央揃え
+	ImagePlayLevelup.IsDraw = FALSE;
 
 	//エンド背景画像1
 	strcpy_s(ImageEndBack1.path, IMAGE_END_BACK1_PATH);		    //パスの設定
