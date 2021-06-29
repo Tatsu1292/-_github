@@ -53,7 +53,7 @@
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明.png")           //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
-#define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
+#define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\ed3枠有.png")              //エンド背景ひなパターン3
 #define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\タイトルにもどるボタン暗.png")            //エンド　タイトルへボタン
 #define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\もういちど遊ぶボタン暗.png")            //エンド　もう一回ボタン
 #define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\タイトルにもどるボタン明.png")           //エンド　タイトルへボタン2
@@ -1440,7 +1440,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack3.x, ImageEndBack3.y, ImageEndBack3.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-		    setMessage("さようなら");
+		    setMessage("成鳥しました");
 		}
 	}
 
