@@ -53,7 +53,7 @@
 #define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明.png")           //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
-#define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\背景連続_補正あり1.png")   //エンド背景ひなパターン3
+#define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\ed3枠有.png")              //エンド背景ひなパターン3
 #define IMAGE_END_TBUTTON_PATH   TEXT(".\\IMAGE\\タイトルにもどるボタン暗.png")            //エンド　タイトルへボタン
 #define IMAGE_END_ABUTTON_PATH   TEXT(".\\IMAGE\\もういちど遊ぶボタン暗.png")            //エンド　もう一回ボタン
 #define IMAGE_END_TBUTTON2_PATH  TEXT(".\\IMAGE\\タイトルにもどるボタン明.png")           //エンド　タイトルへボタン2
@@ -82,7 +82,7 @@
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
 #define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
 #define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
-#define ENEMY_NUM				10    //　敵のＭＡＸ値
+#define ENEMY_NUM				5    //　敵のＭＡＸ値
 
 
 //アイテム
@@ -238,7 +238,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 //敵生成関連
 int enemykind;                          //敵の種類
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = 200/*GAME_FPS * 10*/;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -719,7 +719,7 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(TitleBGM.handle, DX_PLAYTYPE_LOOP); //ループ再生
 	}
 
-	//エンターキーを押したら、プレイシーンへ移動する
+	//エンターキーを押したら、ルール説明シーンへ移動する
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		//BGM停止
@@ -730,8 +730,6 @@ VOID MY_START_PROC(VOID)
 
 		ChangeVolumeSoundMem(GAME_SOUND_VOLUME, TitleSE.handle);//SEの音量調整
 		PlaySoundMem(TitleSE.handle, DX_PLAYTYPE_BACK);//SEを鳴らす
-
-		MY_PLAY_INIT();	//ゲーム初期化
 
 		//ゲームのシーンをプレイ画面にする
 		GameScene = GAME_SCENE_RULE;
@@ -891,7 +889,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		enemy[i].IsDraw = FALSE;
 		enemy[i].IsCreate = FALSE;
-		enemy[i].image.x = GAME_WIDTH/* + i * 100*/;
+		enemy[i].image.x = GAME_WIDTH + i * 100;
 	}
 
 	//スコアの初期化
@@ -948,26 +946,19 @@ VOID MY_PLAY_PROC(VOID)
 		//敵を生成するか決める
 		for (int index = 0; index < ENEMY_NUM; index++)
 		{
-
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
 				//ランダムで0,1が出れば敵生成
 				if (GameLevel == LEVEL_EASY)
 				{
-					enemykind = GetRand(30);
+					enemykind = GetRand(10);
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(10);
+					enemykind = GetRand(5);
 				}
 				
-				/*if (enemykind == 2)
-				{
-					enemy[index] = karasu1;
-					enemy[index].image.x = GAME_WIDTH;
-				}*/
-
 				if (2 > enemykind)
 				{
 					switch (enemykind)
@@ -977,15 +968,14 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					case 1:
 						enemy[index] = karasu2;
-						break;
 					default:
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH /*+ index * 10*/;	
+					enemy[index].image.x = GAME_WIDTH + index * 10;	
 					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
-					/*EnemyAtari(&enemy[index]);*/
+					//EnemyAtari(&enemy[index]);
 
 					enemy[index].IsCreate = TRUE;
 				}
@@ -1013,7 +1003,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//ライフが０になったらエンドシーンへ遷移する
-	if (0 > player.life)
+	if (player.life == 0)
 	{
 		//BGM停止
 		if (CheckSoundMem(PlayBGM.handle) != 0)//BGMが流れていたら
@@ -1134,12 +1124,13 @@ VOID MY_PLAY_PROC(VOID)
 		//プレイ画面での敵の構造
 		for (int i = 0; i < ENEMY_NUM; i++)
 		{
-			enemy[i].image.x -= enemy[i].speed;
-
-			EnemyAtari(&enemy[i]);
-
+			
 			if (enemy[i].image.IsDraw == TRUE)
 			{
+				enemy[i].image.x -= enemy[i].speed;
+
+				EnemyAtari(&enemy[i]);
+
 				if (MY_CHECK_RECT_COLL(enemy[i].rect, PlayerRect) == TRUE)
 				{
 					/*mutekicount = 0;*/
@@ -1207,7 +1198,7 @@ VOID MY_PLAY_PROC(VOID)
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
-			ImagePlayLevelup.IsDraw = TRUE;
+			ImageRuleEx.IsDraw = TRUE;
 			if (Lvcount == 1)
 			{
 				ChangeVolumeSoundMem(GAME_SOUND_VOLUME, LvUPSE.handle);
@@ -1216,7 +1207,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 		else
 		{
-			ImagePlayLevelup.IsDraw = FALSE;
+			ImageRuleEx.IsDraw = FALSE;
 		}
 		
 	}
@@ -1265,10 +1256,6 @@ VOID MY_PLAY_DRAW(VOID)
 	//DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatStringToHandle(0, 0, GetColor(180, 255, 0),FontUzu.handle, "SCORE:%d", score);
 
-	DrawFormatString(500,0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
-	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
-
-
 	//エサを描画
 	for (int i = 0; i < ESA_MAX; i++)
 	{
@@ -1287,7 +1274,7 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
-			/*enemy[i].image.x = GAME_WIDTH + i * 100;*/
+			enemy[i].image.x = GAME_WIDTH + i * 100;
 		}/*
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
@@ -1394,7 +1381,6 @@ VOID MY_END_PROC(VOID)
 				StopSoundMem(EndBGM.handle); //止める
 			}
 
-			MY_PLAY_INIT();
 			GameScene = GAME_SCENE_START;
 		}
 	}
@@ -1409,7 +1395,6 @@ VOID MY_END_PROC(VOID)
 				StopSoundMem(EndBGM.handle); //止める
 			}
 
-			MY_PLAY_INIT();
 			GameScene = GAME_SCENE_RULE;
 		}
 	}
@@ -1455,7 +1440,7 @@ VOID MY_END_DRAW(VOID)
 		DrawGraph(ImageEndBack3.x, ImageEndBack3.y, ImageEndBack3.handle, TRUE);
 		if (MY_KEY_UP(KEY_INPUT_SPACE) == TRUE)
 		{
-		    setMessage("さようなら");
+		    setMessage("成鳥しました");
 		}
 	}
 
@@ -1747,8 +1732,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(karasu1.image.handle, &karasu1.image.width, &karasu1.image.height);
-	//karasu1.image.x = GAME_WIDTH + 0 * (+100);
-	//karasu1.image.y = 100;
+	karasu1.image.x = GAME_WIDTH + 0 * (+100);
+	karasu1.image.y = 100;
 	karasu1.speed = 4;
 
 
@@ -1761,8 +1746,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(karasu2.image.handle, &karasu2.image.width, &karasu2.image.height);
-	//karasu2.image.x = GAME_WIDTH + 1 * (+100);
-	//karasu2.image.y = 500;
+	karasu2.image.x = GAME_WIDTH + 1 * (+100);
+	karasu2.image.y = 500;
 	karasu2.speed = 6;
 
 
