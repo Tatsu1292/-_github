@@ -875,7 +875,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 10);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 20);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = 100 + GetRand(GAME_HEIGHT  - esa[i].height - 100);
@@ -1003,7 +1003,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//ライフが０になったらエンドシーンへ遷移する
-	if (player.life == 0)
+	if (0>player.life)
 	{
 		//BGM停止
 		if (CheckSoundMem(PlayBGM.handle) != 0)//BGMが流れていたら
@@ -1103,9 +1103,9 @@ VOID MY_PLAY_PROC(VOID)
 
 			if (esa[i].x + esa[i].width < 0)
 			{
-				int X_ichi = GetRand(50);
+				int X_ichi = GetRand(20);
 
-				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配置
+				esa[i].x = GAME_WIDTH * (X_ichi+1);	//エサを右画面外にランダム配置
 			}
 
 			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
@@ -1113,9 +1113,9 @@ VOID MY_PLAY_PROC(VOID)
 				score += EsaScore;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
 				SCORE_WORD = TRUE;
-				int X_ichi = GetRand(50);
+				int X_ichi = GetRand(20);
 
-				esa[i].x = GAME_WIDTH + esa[i].width * X_ichi;	//エサを右画面外にランダム配
+				esa[i].x = GAME_WIDTH * (X_ichi + 1);	//エサを右画面外にランダム配
 			}
 
 			
@@ -1198,7 +1198,7 @@ VOID MY_PLAY_PROC(VOID)
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
-			ImageRuleEx.IsDraw = TRUE;
+			ImagePlayLevelup.IsDraw = TRUE;
 			if (Lvcount == 1)
 			{
 				ChangeVolumeSoundMem(GAME_SOUND_VOLUME, LvUPSE.handle);
@@ -1207,7 +1207,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 		else
 		{
-			ImageRuleEx.IsDraw = FALSE;
+			ImagePlayLevelup.IsDraw = FALSE;
 		}
 		
 	}
