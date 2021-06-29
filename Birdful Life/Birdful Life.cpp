@@ -238,7 +238,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 //敵生成関連
 int enemykind;                          //敵の種類
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 10;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = 200/*GAME_FPS * 10*/;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -891,7 +891,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		enemy[i].IsDraw = FALSE;
 		enemy[i].IsCreate = FALSE;
-		enemy[i].image.x = GAME_WIDTH + i * 100;
+		enemy[i].image.x = GAME_WIDTH/* + i * 100*/;
 	}
 
 	//スコアの初期化
@@ -948,6 +948,7 @@ VOID MY_PLAY_PROC(VOID)
 		//敵を生成するか決める
 		for (int index = 0; index < ENEMY_NUM; index++)
 		{
+
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
@@ -961,6 +962,12 @@ VOID MY_PLAY_PROC(VOID)
 					enemykind = GetRand(10);
 				}
 				
+				/*if (enemykind == 2)
+				{
+					enemy[index] = karasu1;
+					enemy[index].image.x = GAME_WIDTH;
+				}*/
+
 				if (2 > enemykind)
 				{
 					switch (enemykind)
@@ -970,11 +977,12 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					case 1:
 						enemy[index] = karasu2;
+						break;
 					default:
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH + index * 10;	
+					enemy[index].image.x = GAME_WIDTH /*+ index * 10*/;	
 					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
 					enemy[index].image.IsDraw = TRUE;	
 					/*EnemyAtari(&enemy[index]);*/
@@ -1005,7 +1013,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//ライフが０になったらエンドシーンへ遷移する
-	if (player.life == 0)
+	if (0 > player.life)
 	{
 		//BGM停止
 		if (CheckSoundMem(PlayBGM.handle) != 0)//BGMが流れていたら
@@ -1199,7 +1207,7 @@ VOID MY_PLAY_PROC(VOID)
 		if (Lvcount <= 100)
 		{
 			Lvcount++;
-			ImageRuleEx.IsDraw = TRUE;
+			ImagePlayLevelup.IsDraw = TRUE;
 			if (Lvcount == 1)
 			{
 				ChangeVolumeSoundMem(GAME_SOUND_VOLUME, LvUPSE.handle);
@@ -1208,7 +1216,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 		else
 		{
-			ImageRuleEx.IsDraw = FALSE;
+			ImagePlayLevelup.IsDraw = FALSE;
 		}
 		
 	}
@@ -1257,6 +1265,10 @@ VOID MY_PLAY_DRAW(VOID)
 	//DrawFormatString(600, 0, GetColor(255, 0, 0), "LIFE:%d", player.life);
 	DrawFormatStringToHandle(0, 0, GetColor(180, 255, 0),FontUzu.handle, "SCORE:%d", score);
 
+	DrawFormatString(500,0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
+	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
+
+
 	//エサを描画
 	for (int i = 0; i < ESA_MAX; i++)
 	{
@@ -1275,7 +1287,7 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
-			enemy[i].image.x = GAME_WIDTH + i * 100;
+			/*enemy[i].image.x = GAME_WIDTH + i * 100;*/
 		}/*
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
@@ -1735,8 +1747,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(karasu1.image.handle, &karasu1.image.width, &karasu1.image.height);
-	karasu1.image.x = GAME_WIDTH + 0 * (+100);
-	karasu1.image.y = 100;
+	//karasu1.image.x = GAME_WIDTH + 0 * (+100);
+	//karasu1.image.y = 100;
 	karasu1.speed = 4;
 
 
@@ -1749,8 +1761,8 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}
 	GetGraphSize(karasu2.image.handle, &karasu2.image.width, &karasu2.image.height);
-	karasu2.image.x = GAME_WIDTH + 1 * (+100);
-	karasu2.image.y = 500;
+	//karasu2.image.x = GAME_WIDTH + 1 * (+100);
+	//karasu2.image.y = 500;
 	karasu2.speed = 6;
 
 
