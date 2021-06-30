@@ -45,6 +45,7 @@
 
 #define MUSIC_DAMAGE_PATH TEXT(".\\MUSIC\\damage1.mp3")						 //ダメージ効果音
 #define MUSIC_GET_PATH TEXT(".\\MUSIC\\score2.mp3")							 //エサをとったときの効果音
+#define MUSIC_GET2_PATH TEXT(".\\MUSIC\\食べ物をパクッ.mp3")							 //エサ缶をとったときの効果音
 #define MUSIC_LVUP_PATH TEXT(".\\MUSIC\\LveleUP.mp3")						//レベルアップしたときの効果音
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
@@ -87,6 +88,7 @@
 
 //アイテム
 #define IMAGE_ESA_PATH	TEXT(".\\IMAGE\\米.png")	//エサの画像
+#define IMAGE_ESA2_PATH	TEXT(".\\IMAGE\\エサ缶_サイズ調整.png")	//エサの画像
 #define IMAGE_LIFE_PATH	TEXT(".\\IMAGE\\ライフ.png")	//ライフの画像
 #define ESA_MAX 20		//エサの最大出現数
 #define LIFE_MAX 3     //ライフ最大数
@@ -231,7 +233,8 @@ int tennmetu;		//点滅時間を測るカウント
 int Lvcount;			//レベルアップの画像を表示する時間
 int WordCount;      //文字を出し続ける時間
 
-BOOL SCORE_WORD = FALSE; //文字が出るか
+BOOL SCORE_WORD = FALSE; //エサを取った時のスコアの文字が出るか
+BOOL SCORE_WORD2 = FALSE; //エサ缶を取った時のスコアの文字が出るか
 BOOL Ishit = TRUE;		//当たり判定がつくか
 BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
@@ -242,9 +245,11 @@ int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
+IMAGE esakan[ESA_MAX];
 IMAGE heart[LIFE_MAX];
 int score = 0;
 int EsaScore = 50;
+int EsakanScore = 100;
 
 //音楽関連
 MUSIC TitleBGM;	//タイトルBGM
@@ -254,6 +259,7 @@ MUSIC PlayBGM;  //プレイBGM
 MUSIC EndBGM;	//エンドBGM
 
 MUSIC GetSE;   //エサ取り効果音
+MUSIC GetSE2;  //エサ缶取り効果音
 MUSIC DamageSE;    //ダメージ効果音
 MUSIC LvUPSE;    //ダメージ効果音
 
@@ -875,7 +881,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 20);	//エサのX初期位置(エサ10個分の横幅間隔で出現); 
+		esa[i].x = (GAME_WIDTH + esa[i].width * i * 20);	//エサのX初期位置(エサ20個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = 100 + GetRand(GAME_HEIGHT  - esa[i].height - 100);
@@ -883,6 +889,22 @@ VOID MY_PLAY_INIT(VOID)
 		esa[i].y = ichi;
 
 	}
+
+
+	//エサ缶の初期位置
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		esakan[i] = esakan[0];
+
+		esakan[i].x = GAME_WIDTH + (10000 * (i+0));	//エサ缶のX初期位置
+
+		//エサ缶のY位置をランダムにする
+		int ichi = 100 + GetRand(GAME_HEIGHT - esakan[i].height - 100);
+
+		esakan[i].y = ichi;
+
+	}
+
 
 	//敵の初期位置
 	for (int i = 0; i < ENEMY_NUM; i++)
@@ -1088,6 +1110,13 @@ VOID MY_PLAY_PROC(VOID)
 			{
 				esa[i].x -= 4;	//エサを左に動かす
 			}
+
+			if (esakan[i].x > 0 - esakan[i].width)
+			{
+				esakan[i].x -= 4;	//エサ缶を左に動かす
+			}
+
+
 			//else
 			//{
 			//	int X_ichi = GetRand(20);
@@ -1101,21 +1130,49 @@ VOID MY_PLAY_PROC(VOID)
 			EsaRect.right = esa[i].x + esa[i].width;
 			EsaRect.bottom = esa[i].y + esa[i].height;
 
-			if (esa[i].x + esa[i].width < 0)
+
+			RECT EsakanRect;
+			EsakanRect.left = esakan[i].x;
+			EsakanRect.top = esakan[i].y;
+			EsakanRect.right = esakan[i].x + esakan[i].width;
+			EsakanRect.bottom = esakan[i].y + esakan[i].height;
+
+
+
+			if (esa[i].x + esa[i].width < 0) //エサが画面外に行ったら
 			{
 				int X_ichi = GetRand(20);
 
 				esa[i].x = GAME_WIDTH * (X_ichi+1);	//エサを右画面外にランダム配置
 			}
 
-			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE)
+			if (MY_CHECK_RECT_COLL(PlayerRect, EsaRect) == TRUE) //プレイヤーがエサに当たったら
 			{
 				score += EsaScore;
 				PlaySoundMem(GetSE.handle, DX_PLAYTYPE_BACK);
+				WordCount = 0;
 				SCORE_WORD = TRUE;
 				int X_ichi = GetRand(20);
 
 				esa[i].x = GAME_WIDTH * (X_ichi + 1);	//エサを右画面外にランダム配
+			}
+
+
+
+
+			if (esakan[i].x + esakan[i].width < 0) //エサ缶が画面外に行ったら
+			{
+				esakan[i].x = GAME_WIDTH + (10000 * (i + 1 + ESA_MAX));	//エサ缶を右画面外にランダム配置
+			}
+
+			if (MY_CHECK_RECT_COLL(PlayerRect, EsakanRect) == TRUE) //プレイヤーがエサ缶に当たったら
+			{
+				score += EsakanScore;
+				PlaySoundMem(GetSE2.handle, DX_PLAYTYPE_BACK);
+				WordCount = 0;
+				SCORE_WORD2 = TRUE;
+
+				esakan[i].x = GAME_WIDTH + (10000 * (i + 1 + ESA_MAX));	//エサ缶を右画面外にランダム配置
 			}
 
 			
@@ -1267,6 +1324,16 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 
+	//エサ缶を描画
+	for (int i = 0; i < ESA_MAX; i++)
+	{
+		if (esakan[i].IsDraw == TRUE)
+		{
+			DrawGraph(esakan[i].x, esakan[i].y, esakan[i].handle, TRUE);
+		}
+		DrawBox(esakan[i].x, esakan[i].y, esakan[i].x + esakan[i].width, esakan[i].y + esakan[i].height, GetColor(255, 0, 0), FALSE);
+	}
+
 	//敵の描画
 	for (int i = 0; i < ENEMY_NUM; i++)
 	{
@@ -1343,6 +1410,21 @@ VOID MY_PLAY_DRAW(VOID)
 		else
 		{
 			SCORE_WORD = FALSE;
+			WordCount = 0;
+		}
+	}
+
+
+	if (SCORE_WORD2 == TRUE)
+	{
+		if (WordCount <= 30)
+		{
+			WordCount++;
+			DrawFormatStringToHandle(player.x + player.width / 2, player.y - 45, GetColor(218, 179, 0), FontUzu2.handle, "+%d", EsakanScore);
+		}
+		else
+		{
+			SCORE_WORD2 = FALSE;
 			WordCount = 0;
 		}
 	}
@@ -1763,6 +1845,18 @@ BOOL MY_LOAD_IMAGE(VOID)
 	esa[0].IsDraw = TRUE;
 
 
+	//エサ缶
+	strcpy_s(esakan[0].path, IMAGE_ESA2_PATH);
+	esakan[0].handle = LoadGraph(esakan[0].path);
+	if (esakan[0].handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_ESA2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(esakan[0].handle, &esakan[0].width, &esakan[0].height);
+	esakan[0].IsDraw = TRUE;
+
+
 	//ハート
 	strcpy_s(heart[0].path, IMAGE_LIFE_PATH);
 	heart[0].handle = LoadGraph(heart[0].path);
@@ -1885,6 +1979,16 @@ BOOL MY_LOAD_MUSIC(VOID)
 		return FALSE;
 	}
 
+
+	//エサ缶を取った時の効果音
+	strcpy_s(GetSE2.path, MUSIC_GET2_PATH);
+	GetSE2.handle = LoadSoundMem(GetSE2.path);
+	if (GetSE2.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), MUSIC_GET2_PATH, MUSIC_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+
 	//ダメージ効果音
 	strcpy_s(DamageSE.path, MUSIC_DAMAGE_PATH);
 	DamageSE.handle = LoadSoundMem(DamageSE.path);
@@ -1925,6 +2029,7 @@ VOID MY_DELETE_MUSIC(VOID)
 	DeleteSoundMem(RuleBGM.handle);
 	DeleteSoundMem(PlayBGM.handle);
 	DeleteSoundMem(GetSE.handle);
+	DeleteSoundMem(GetSE2.handle);
 	DeleteSoundMem(DamageSE.handle);
 	DeleteSoundMem(LvUPSE.handle);
 	DeleteSoundMem(EndBGM.handle);
