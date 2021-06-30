@@ -701,6 +701,7 @@ BOOL MY_FONT_CREATE(VOID)
 VOID MY_FONT_DELETE(VOID)
 {
 	DeleteFontToHandle(FontUzu.handle);
+	DeleteFontToHandle(FontUzu2.handle);
 	return;
 }
 
@@ -830,39 +831,16 @@ VOID MY_RULE_PROC(VOID)
 
 		return;
 	}
-	//”wŒi‰æ‘œ‚ð“®‚©‚·
-	for (int num = 0; num < IMAGE_BACK_NUM; num++)
-	{
-		//‰æ‘œ‚ðˆÚ“®‚³‚¹‚é
-		ImageTitleBack[num].image.x--;//‰E‚©‚ç¶‚É—¬‚ê‚é
-
-		//”wŒi‰æ‘œ‚ð•`‰æ‚Å‚«‚È‚¢‚Æ‚«
-		if (ImageTitleBack[num].IsDraw == FALSE)
-		{
-			//”wŒi‰æ‘œ‚ª‰æ–Ê“à‚É‚¢‚é‚Æ‚«
-			if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width > 0)
-			{
-				ImageTitleBack[num].IsDraw = TRUE;	//‰æ‘œ‚ð•`‰æ‚·‚é
-			}
-		}
-
-		//”wŒi‰æ‘œ‚ª‰æ–Ê‚ð’Ê‚è‰z‚µ‚½‚Æ‚«
-		if (ImageTitleBack[num].image.x + ImageTitleBack[num].image.width < 0)
-		{
-			ImageTitleBack[num].image.x = ImageTitleBack[0].image.width * 3;	//‰æ‘œ‚Ì•‚Q‚Â•ªA¶‚ÉˆÚ“®‚³‚¹‚é
-			ImageTitleBack[num].IsDraw = FALSE;								//‰æ‘œ‚ð•`‰æ‚µ‚È‚¢
-		}
-	}
+	
 	
 	return;
 }
 
 VOID MY_RULE_DRAW(VOID)
 {
-
-	DrawGraph(ImageRuleBack.x, ImageRuleBack.y, ImageRuleBack.handle, TRUE);
-	DrawStringToHandle(GAME_WIDTH / 2, GAME_HEIGHT - FontUzu.size, "Start with Space",FontUzu.handle , GetColor(0,0,0), TRUE);
+    DrawGraph(ImageRuleBack.x, ImageRuleBack.y, ImageRuleBack.handle, TRUE);
 	DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
+	DrawStringToHandle(GAME_WIDTH / 2 - FontUzu2.size * 3.5, GAME_HEIGHT - FontUzu2.size * 2, "Play with Space",GetColor(255, 255, 0), FontUzu2.handle);
 	
 	return;
 }
