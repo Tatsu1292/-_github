@@ -81,8 +81,8 @@
 
 //キャラクター
 #define PLAYER_PATH		TEXT(".\\IMAGE\\player_animation.png")	//プレイヤーの画像
-#define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスノーマル.png")	//敵（カラスの画像）
-#define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスノーマル2.png")	//敵（青カラスの画像）
+#define IMAGE_ENEMY_PATH		TEXT(".\\IMAGE\\カラスアニメーション.png")	//敵（カラスの画像）
+#define IMAGE_ENEMY2_PATH		TEXT(".\\IMAGE\\カラスヤンキーアニメーション.png")	//敵（青カラスの画像）
 #define ENEMY_NUM				5    //　敵のＭＡＸ値
 
 
@@ -160,6 +160,7 @@ typedef struct STRUCT_IMAGE
 {
 	char path[PATH_MAX];		//パス
 	int handle;					//ハンドル
+	int e_handle[2];			//エネミー用のハンドル
 	int x;						//X位置
 	int y;						//Y位置
 	int width;					//幅
@@ -228,6 +229,7 @@ CHARA karasu2;
 
 //カウントまとめ
 int playercount; //プレイヤーのアニメーション用カウント
+int enemycount;  //エネミーのアニメーション用カウント
 int mutekicount;	//無敵時間を測るカウント
 int tennmetu;		//点滅時間を測るカウント
 int Lvcount;			//レベルアップの画像を表示する時間
@@ -874,7 +876,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esakan[i] = esakan[0];
 
-		esakan[i].x = GAME_WIDTH + (10000 * (i+0));	//エサ缶のX初期位置
+		esakan[i].x = GAME_WIDTH + (10000 * (i+1));	//エサ缶のX初期位置
 
 		//エサ缶のY位置をランダムにする
 		int ichi = 100 + GetRand(GAME_HEIGHT - esakan[i].height - 100);
@@ -959,6 +961,7 @@ VOID MY_PLAY_PROC(VOID)
 					enemykind = GetRand(5);
 				}
 				
+				
 				if (2 > enemykind)
 				{
 					switch (enemykind)
@@ -972,8 +975,26 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH + index * 10;	
-					enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+					enemy[index].image.x = GAME_WIDTH;	
+					//enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+					
+
+					// 敵のY位置を3通りからランダムで選出
+					int enemy_y = GetRand(2);
+
+					switch (enemy_y)
+					{
+						case 0:
+							enemy[index].image.y = 100;
+							break;
+						case 1:
+							enemy[index].image.y = 300;
+							break;
+						case 2:
+							enemy[index].image.y = 500;
+							break;
+					}
+					
 					enemy[index].image.IsDraw = TRUE;	
 					//EnemyAtari(&enemy[index]);
 
@@ -1075,9 +1096,9 @@ VOID MY_PLAY_PROC(VOID)
 
 
 		RECT PlayerRect;
-		PlayerRect.left = player.x + 7;
+		PlayerRect.left = player.x + 10;
 		PlayerRect.top = player.y + 30;
-		PlayerRect.right = player.x + player.width;
+		PlayerRect.right = player.x + player.width -10;
 		PlayerRect.bottom = player.y + player.height;
 
 		
@@ -1156,12 +1177,15 @@ VOID MY_PLAY_PROC(VOID)
 			
 		}
 
+		enemycount++;
+
 		//プレイ画面での敵の構造
 		for (int i = 0; i < ENEMY_NUM; i++)
 		{
 			
 			if (enemy[i].image.IsDraw == TRUE)
 			{
+				
 				enemy[i].image.x -= enemy[i].speed;
 
 				EnemyAtari(&enemy[i]);
@@ -1326,9 +1350,18 @@ VOID MY_PLAY_DRAW(VOID)
 			enemy[i].image.IsDraw = TRUE;
 		}*/
 
+		int e;
+
+		e = enemycount % 15 / 5;
+
+		if (e == 2)
+		{
+			e = 0;
+		}
+
 		if (enemy[i].image.IsDraw == TRUE)
 		{
-			DrawGraph(enemy[i].image.x, enemy[i].image.y, enemy[i].image.handle, TRUE);
+			DrawGraph(enemy[i].image.x, enemy[i].image.y, enemy[i].image.e_handle[e], TRUE);
 		}
 		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
 
@@ -1350,7 +1383,7 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		DrawGraph(player.x, player.y, player.handle[a], TRUE);
 	}
-	DrawBox(player.x + 7, player.y + 30, player.x + player.width, player.y + player.height, GetColor(255, 0, 0), FALSE);
+	DrawBox(player.x + 10, player.y + 30, player.x + player.width - 10, player.y + player.height, GetColor(255, 0, 0), FALSE);
 
 
 	
@@ -1406,6 +1439,10 @@ VOID MY_PLAY_DRAW(VOID)
 			WordCount = 0;
 		}
 	}
+
+	//デバッグ用
+	DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
+	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
 
 	return;
 }
@@ -1783,31 +1820,42 @@ BOOL MY_LOAD_IMAGE(VOID)
 	}
 	player.IsDraw = TRUE;
 
+
 	//カラス１
-	strcpy_s(karasu1.image.path, IMAGE_ENEMY_PATH);
+	LoadDivGraph(IMAGE_ENEMY_PATH, 2, 2, 1, 200, 140, karasu1.image.e_handle);
+	for (int i = 0; i < 2; i++)
+	{
+		GetGraphSize(karasu1.image.e_handle[i], &karasu1.image.width, &karasu1.image.height);
+	}
+	/*strcpy_s(karasu1.image.path, IMAGE_ENEMY_PATH);
 	karasu1.image.handle = LoadGraph(karasu1.image.path);
 	if (karasu1.image.handle == -1)
 	{
 		MessageBox(GetMainWindowHandle(), IMAGE_ENEMY_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(karasu1.image.handle, &karasu1.image.width, &karasu1.image.height);
-	karasu1.image.x = GAME_WIDTH + 0 * (+100);
-	karasu1.image.y = 100;
+	GetGraphSize(karasu1.image.handle, &karasu1.image.width, &karasu1.image.height);*/
+	/*karasu1.image.x = GAME_WIDTH + 0 * (+100);
+	karasu1.image.y = 100;*/
 	karasu1.speed = 4;
 
 
 	//カラス２
-	strcpy_s(karasu2.image.path, IMAGE_ENEMY2_PATH);
+	LoadDivGraph(IMAGE_ENEMY2_PATH, 2, 2, 1, 234, 131, karasu2.image.e_handle);
+	for (int i = 0; i < 2; i++)
+	{
+		GetGraphSize(karasu2.image.e_handle[i], &karasu2.image.width, &karasu2.image.height);
+	}
+	/*strcpy_s(karasu2.image.path, IMAGE_ENEMY2_PATH);
 	karasu2.image.handle = LoadGraph(karasu2.image.path);
 	if (karasu2.image.handle == -1)
 	{
 		MessageBox(GetMainWindowHandle(), IMAGE_ENEMY2_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
-	}
+	}*/
 	GetGraphSize(karasu2.image.handle, &karasu2.image.width, &karasu2.image.height);
-	karasu2.image.x = GAME_WIDTH + 1 * (+100);
-	karasu2.image.y = 500;
+	/*karasu2.image.x = GAME_WIDTH + 1 * (+100);
+	karasu2.image.y = 500;*/
 	karasu2.speed = 6;
 
 
