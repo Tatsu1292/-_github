@@ -50,8 +50,7 @@
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_PLAY_LEVELUP_PATH  TEXT(".\\IMAGE\\LevelUP_rogo.png")         //レベルアップ画像
-#define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\背景_ぼかし.png")          //ルール説明画面背景
-#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明.png")           //ルール説明画像
+#define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\ルール説明Comp.png")          //ルール説明画面背景
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\ed3枠有.png")              //エンド背景ひなパターン3
@@ -841,7 +840,6 @@ VOID MY_RULE_PROC(VOID)
 VOID MY_RULE_DRAW(VOID)
 {
     DrawGraph(ImageRuleBack.x, ImageRuleBack.y, ImageRuleBack.handle, TRUE);
-	DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
 	DrawStringToHandle(GAME_WIDTH / 2 - FontUzu2.size * 3.5, GAME_HEIGHT - FontUzu2.size * 2, "Play with Space",GetColor(255, 255, 0), FontUzu2.handle);
 	
 	return;
@@ -1688,20 +1686,6 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageRuleBack.x = GAME_WIDTH / 2 - ImageRuleBack.width / 2;		                    //左右中央揃え
 	ImageRuleBack.y = GAME_HEIGHT / 2 - ImageRuleBack.height / 2;	                    //上下中央揃え
 
-
-	//ルール説明画像
-	strcpy_s(ImageRuleEx.path, IMAGE_RULE_EX_PATH);		    //パスの設定
-	ImageRuleEx.handle = LoadGraph(ImageRuleEx.path);	    //読み込み
-	if (ImageRuleEx.handle == -1)
-	{
-		//エラーメッセージ表示
-		MessageBox(GetMainWindowHandle(), IMAGE_RULE_EX_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-		return FALSE;
-	}
-	GetGraphSize(ImageRuleEx.handle, &ImageRuleEx.width, &ImageRuleEx.height);	//画像の幅と高さを取得
-	ImageRuleEx.x = GAME_WIDTH / 2 - ImageRuleEx.width / 2;		                    //左右中央揃え
-	ImageRuleEx.y = GAME_HEIGHT / 2 - ImageRuleEx.height / 2;	                    //上下中央揃え
-	
 
 	//レベルアップ画像
 	strcpy_s(ImagePlayLevelup.path, IMAGE_PLAY_LEVELUP_PATH);		    //パスの設定
