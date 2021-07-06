@@ -242,7 +242,7 @@ BOOL IsMuteki = FALSE;	//–³“Gó‘Ô‚É‚È‚Á‚Ä‚¢‚é‚©
 //“G¶¬ŠÖ˜A
 int enemykind;                          //“G‚Ìí—Ş
 int TekiCreateCnt = 0;					//“G‚ğì‚éŠÔŠu
-int TekiCreateCntMax = GAME_FPS * 5;	//“G‚ğì‚éŠÔŠu(MAX)
+int TekiCreateCntMax = GAME_FPS * 3;	//“G‚ğì‚éŠÔŠu(MAX)
 
 //ƒAƒCƒeƒ€ŠÖ˜A
 IMAGE esa[ESA_MAX];
@@ -890,6 +890,7 @@ VOID MY_PLAY_INIT(VOID)
 		enemy[i].IsDraw = FALSE;
 		enemy[i].IsCreate = FALSE;
 		enemy[i].image.x = GAME_WIDTH + i * 100;
+		enemy[i].speed = 0;
 	}
 
 	//ƒXƒRƒA‚Ì‰Šú‰»
@@ -957,6 +958,10 @@ VOID MY_PLAY_PROC(VOID)
 				else if (GameLevel == LEVEL_NOMAL)
 				{
 					enemykind = GetRand(5);
+				}
+				else if (GameLevel == LEVEL_HARD)
+				{
+					enemykind = GetRand(3);
 				}
 				
 				
@@ -1245,7 +1250,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//ƒŒƒxƒ‹ƒAƒbƒv
-	if (score >= 500) 
+	if (score >= 700) 
 	{
 		for (int num = 0; num < IMAGE_BACK_NUM; num++)
 		{
@@ -1441,6 +1446,7 @@ VOID MY_PLAY_DRAW(VOID)
 	//ƒfƒoƒbƒO—p
 	DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
 	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
+	DrawFormatString(500, 40, GetColor(255, 0, 0), "Lvcount:%d", Lvcount);                
 
 	return;
 }
