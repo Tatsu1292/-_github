@@ -242,6 +242,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
 //敵生成関連
 int enemykind;                          //敵の種類
+int enemykazu;
 int TekiCreateCnt = 0;					//敵を作る間隔
 int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
 
@@ -861,7 +862,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 20);	//エサのX初期位置(エサ20個分の横幅間隔で出現); 
+		esa[i].x = GAME_WIDTH + 50 + esa[i].width * i * 25;	//エサのX初期位置(エサ20個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = 100 + GetRand(GAME_HEIGHT  - esa[i].height - 100);
@@ -891,7 +892,8 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		enemy[i].IsDraw = FALSE;
 		enemy[i].IsCreate = FALSE;
-		enemy[i].image.x = GAME_WIDTH + i * 100;
+		enemy[i].image.x =GAME_WIDTH /* + i * 100*/;
+
 	}
 
 	//スコアの初期化
@@ -951,19 +953,20 @@ VOID MY_PLAY_PROC(VOID)
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
-				//ランダムで0,1が出れば敵生成
+
 				if (GameLevel == LEVEL_EASY)
 				{
-					enemykind = GetRand(10);
+					enemy[index] = karasu1;
+
+					enemy[0].image.IsDraw = TRUE;
+
+					/*enemykind = GetRand(10);*/
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(5);
-				}
-				
-				
-				if (2 > enemykind)
-				{
+
+					enemykind = GetRand(1);
+
 					switch (enemykind)
 					{
 					case 0:
@@ -971,35 +974,76 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					case 1:
 						enemy[index] = karasu2;
+						break;
 					default:
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH;	
-					//enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
-					
+					enemykazu = GetRand(1);
 
-					// 敵のY位置を3通りからランダムで選出
-					int enemy_y = GetRand(2);
-
-					switch (enemy_y)
+					switch (enemykazu)
 					{
-						case 0:
-							enemy[index].image.y = 100;
-							break;
-						case 1:
-							enemy[index].image.y = 300;
-							break;
-						case 2:
-							enemy[index].image.y = 500;
-							break;
+					case 0:
+						enemy[0].image.IsDraw = TRUE;
+						break;
+					case 1:
+						enemy[0].image.IsDraw = TRUE;
+						enemy[1].image.IsDraw = TRUE;
+						break;
+					default:
+						break;
 					}
-					
-					enemy[index].image.IsDraw = TRUE;	
-					//EnemyAtari(&enemy[index]);
-
-					enemy[index].IsCreate = TRUE;
 				}
+
+
+				enemy[index].image.y = 100 + GetRand(GAME_HEIGHT - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+				enemy[index].IsCreate = TRUE;
+				enemy[index].image.x = GAME_WIDTH;
+
+				//else if (GameLevel == LEVEL_NOMAL)
+				//{
+				//	enemykind = GetRand(5);
+				//}
+				//
+				//
+				//if (2 > enemykind)
+				//{
+				//	switch (enemykind)
+				//	{
+				//	case 0:
+				//		enemy[index] = karasu1;
+				//		break;
+				//	case 1:
+				//		enemy[index] = karasu2;
+				//	default:
+				//		break;
+				//	}
+
+				//	enemy[index].image.x = GAME_WIDTH;	
+				//	//enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+				//	
+
+				//	// 敵のY位置を3通りからランダムで選出
+				//	int enemy_y = GetRand(2);
+
+				//	switch (enemy_y)
+				//	{
+				//		case 0:
+				//			enemy[index].image.y = 100;
+				//			break;
+				//		case 1:
+				//			enemy[index].image.y = 350;
+				//			break;
+				//		case 2:
+				//			enemy[index].image.y = 580;
+				//			break;
+				//	}
+				//	
+				//	enemy[index].image.IsDraw = TRUE;	
+				//	//EnemyAtari(&enemy[index]);
+
+				//	enemy[index].IsCreate = TRUE;
+				//}
 			}
 		}
 
@@ -1208,27 +1252,28 @@ VOID MY_PLAY_PROC(VOID)
 	
 
 	//無敵時間
-	if (IsMuteki == TRUE)
+	if (IsMuteki == TRUE) //無敵状態になったら
 	{
 		mutekicount++;		//無敵時間を数えるカウントを増やす。
 
-		if (mutekicount >= 100)
+		if (mutekicount >= 100)	//無敵時間を数えるカウントが１００以上になれば
 		{
-			Ishit = TRUE;
-			IsMuteki = FALSE;
-			player.IsDraw = TRUE;
-			mutekicount = 0;
+			Ishit = TRUE;			//当たり判定をオンにする
+			IsMuteki = FALSE;		//無敵状態を解除する
+			player.IsDraw = TRUE;	//プレイヤーの画像を映す
+			mutekicount = 0;		//無敵時間を数えるカウントを０にする
 		}
-		else if (mutekicount <= 100)
+		else if (mutekicount <= 100)	//無敵時間を数えるカウントが１００以下になれば
 		{
-			Ishit = FALSE;	//当たり判定関数オフ
+			Ishit = FALSE;			//当たり判定関数オフ
 
-			if (tennmetu < 5) //点滅の時間間隔を設定
+			if (tennmetu < 5)		//点滅の時間を数えるカウントが５以下なら
 			{
-				tennmetu += 1;
+				tennmetu += 1;		//点滅時間を数えるカウントを増やす
 			}
 			else
 			{
+				//点滅させる
 				if (player.IsDraw == TRUE)
 				{
 					player.IsDraw = FALSE;
@@ -1238,7 +1283,7 @@ VOID MY_PLAY_PROC(VOID)
 					player.IsDraw = TRUE;
 				}
 
-				tennmetu = 0;
+				tennmetu = 0;	//点滅時間を数えるカウントを０にする
 			}
 
 		}
@@ -1343,7 +1388,7 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
-			enemy[i].image.x = GAME_WIDTH + i * 100;
+			enemy[i].image.x = GAME_WIDTH/* + i * 100*/;
 		}/*
 		else if (enemy[i].image.x <= GAME_WIDTH)
 		{
