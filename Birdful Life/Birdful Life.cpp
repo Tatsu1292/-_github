@@ -51,7 +51,7 @@
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_PLAY_LEVELUP_PATH  TEXT(".\\IMAGE\\LevelUP_rogo.png")         //レベルアップ画像
 #define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\背景_ぼかし.png")          //ルール説明画面背景
-#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明.png")           //ルール説明画像
+#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明Comp.png")           //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\ed3枠有.png")              //エンド背景ひなパターン3
@@ -244,7 +244,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 int enemykind;                          //敵の種類
 int enemykazu;
 int TekiCreateCnt = 0;					//敵を作る間隔
-int TekiCreateCntMax = GAME_FPS * 5;	//敵を作る間隔(MAX)
+int TekiCreateCntMax = GAME_FPS * 3;	//敵を作る間隔(MAX)
 
 //アイテム関連
 IMAGE esa[ESA_MAX];
@@ -994,11 +994,46 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					}
 				}
+				else if (GameLevel == LEVEL_HARD)
+				{
+
+					enemykind = GetRand(1);
+
+					switch (enemykind)
+					{
+					case 0:
+						enemy[index] = karasu1;
+						break;
+					case 1:
+						enemy[index] = karasu2;
+						break;
+					default:
+						break;
+					}
+
+					enemykazu = GetRand(1);
+
+					switch (enemykazu)
+					{
+					case 0:
+						enemy[0].image.IsDraw = TRUE;
+						break;
+					case 1:
+						enemy[0].image.IsDraw = TRUE;
+						enemy[1].image.IsDraw = TRUE;
+						break;
+					default:
+						break;
+					}
+				}
 
 
-				enemy[index].image.y = 100 + GetRand(GAME_HEIGHT - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+				enemy[0].image.y = 100 + 100 * GetRand(2);
+				enemy[1].image.y = 400 + 100 * GetRand(2);
+				/*enemy[index].image.y = 100 + GetRand(GAME_HEIGHT - enemy[index].image.height - 100);*/	//敵の出現Y位置をランダム
 				enemy[index].IsCreate = TRUE;
 				enemy[index].image.x = GAME_WIDTH;
+
 
 				//else if (GameLevel == LEVEL_NOMAL)
 				//{
