@@ -50,7 +50,8 @@
 
 //画像パス　※名前の付け方は基本的にIMAGE_シーン名_何の画像か_PATH
 #define IMAGE_PLAY_LEVELUP_PATH  TEXT(".\\IMAGE\\LevelUP_rogo.png")         //レベルアップ画像
-#define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\ルール説明Comp.png")          //ルール説明画面背景
+#define IMAGE_RULE_BACK_PATH     TEXT(".\\IMAGE\\背景_ぼかし.png")          //ルール説明画面背景
+#define IMAGE_RULE_EX_PATH       TEXT(".\\IMAGE\\ルール説明Comp.png")           //ルール説明画像
 #define IMAGE_END_BACK1_PATH     TEXT(".\\IMAGE\\ed1枠有.png")              //エンド背景ひなパターン1
 #define IMAGE_END_BACK2_PATH     TEXT(".\\IMAGE\\ed2枠有.png")              //エンド背景ひなパターン2
 #define IMAGE_END_BACK3_PATH     TEXT(".\\IMAGE\\ed3枠有.png")              //エンド背景ひなパターン3
@@ -241,6 +242,7 @@ BOOL IsMuteki = FALSE;	//無敵状態になっているか
 
 //敵生成関連
 int enemykind;                          //敵の種類
+int enemykazu;
 int TekiCreateCnt = 0;					//敵を作る間隔
 int TekiCreateCntMax = GAME_FPS * 3;	//敵を作る間隔(MAX)
 
@@ -840,6 +842,7 @@ VOID MY_RULE_PROC(VOID)
 VOID MY_RULE_DRAW(VOID)
 {
     DrawGraph(ImageRuleBack.x, ImageRuleBack.y, ImageRuleBack.handle, TRUE);
+	DrawGraph(ImageRuleEx.x, ImageRuleEx.y, ImageRuleEx.handle, TRUE);
 	DrawStringToHandle(GAME_WIDTH / 2 - FontUzu2.size * 3.5, GAME_HEIGHT - FontUzu2.size * 2, "Play with Space",GetColor(255, 255, 0), FontUzu2.handle);
 	
 	return;
@@ -859,7 +862,7 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		esa[i] = esa[0];	//エサ0の情報を全てのエサにコピー
 
-		esa[i].x = (GAME_WIDTH + esa[i].width * i * 20);	//エサのX初期位置(エサ20個分の横幅間隔で出現); 
+		esa[i].x = GAME_WIDTH + 50 + esa[i].width * i * 25;	//エサのX初期位置(エサ20個分の横幅間隔で出現); 
 
 		//エサのY位置をランダムにする
 		int ichi = 100 + GetRand(GAME_HEIGHT  - esa[i].height - 100);
@@ -889,8 +892,8 @@ VOID MY_PLAY_INIT(VOID)
 	{
 		enemy[i].IsDraw = FALSE;
 		enemy[i].IsCreate = FALSE;
-		enemy[i].image.x = GAME_WIDTH + i * 100;
-		enemy[i].speed = 0;
+		enemy[i].image.x =GAME_WIDTH /* + i * 100*/;
+
 	}
 
 	//スコアの初期化
@@ -950,23 +953,20 @@ VOID MY_PLAY_PROC(VOID)
 			//敵がまだ生成されていないとき
 			if (enemy[index].IsCreate == FALSE)
 			{
-				//ランダムで0,1が出れば敵生成
+
 				if (GameLevel == LEVEL_EASY)
 				{
-					enemykind = GetRand(10);
+					enemy[index] = karasu1;
+
+					enemy[0].image.IsDraw = TRUE;
+
+					/*enemykind = GetRand(10);*/
 				}
 				else if (GameLevel == LEVEL_NOMAL)
 				{
-					enemykind = GetRand(5);
-				}
-				else if (GameLevel == LEVEL_HARD)
-				{
-					enemykind = GetRand(3);
-				}
-				
-				
-				if (2 > enemykind)
-				{
+
+					enemykind = GetRand(1);
+
 					switch (enemykind)
 					{
 					case 0:
@@ -974,35 +974,111 @@ VOID MY_PLAY_PROC(VOID)
 						break;
 					case 1:
 						enemy[index] = karasu2;
+						break;
 					default:
 						break;
 					}
 
-					enemy[index].image.x = GAME_WIDTH;	
-					//enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
-					
+					enemykazu = GetRand(1);
 
-					// 敵のY位置を3通りからランダムで選出
-					int enemy_y = GetRand(2);
-
-					switch (enemy_y)
+					switch (enemykazu)
 					{
-						case 0:
-							enemy[index].image.y = 100;
-							break;
-						case 1:
-							enemy[index].image.y = 300;
-							break;
-						case 2:
-							enemy[index].image.y = 500;
-							break;
+					case 0:
+						enemy[0].image.IsDraw = TRUE;
+						break;
+					case 1:
+						enemy[0].image.IsDraw = TRUE;
+						enemy[1].image.IsDraw = TRUE;
+						break;
+					default:
+						break;
 					}
-					
-					enemy[index].image.IsDraw = TRUE;	
-					//EnemyAtari(&enemy[index]);
-
-					enemy[index].IsCreate = TRUE;
 				}
+				else if (GameLevel == LEVEL_HARD)
+				{
+
+					enemykind = GetRand(1);
+
+					switch (enemykind)
+					{
+					case 0:
+						enemy[index] = karasu1;
+						break;
+					case 1:
+						enemy[index] = karasu2;
+						break;
+					default:
+						break;
+					}
+
+					enemykazu = GetRand(1);
+
+					switch (enemykazu)
+					{
+					case 0:
+						enemy[0].image.IsDraw = TRUE;
+						break;
+					case 1:
+						enemy[0].image.IsDraw = TRUE;
+						enemy[1].image.IsDraw = TRUE;
+						break;
+					default:
+						break;
+					}
+				}
+
+
+				enemy[0].image.y = 100 + 100 * GetRand(2);
+				enemy[1].image.y = 400 + 100 * GetRand(2);
+				/*enemy[index].image.y = 100 + GetRand(GAME_HEIGHT - enemy[index].image.height - 100);*/	//敵の出現Y位置をランダム
+				enemy[index].IsCreate = TRUE;
+				enemy[index].image.x = GAME_WIDTH;
+
+
+				//else if (GameLevel == LEVEL_NOMAL)
+				//{
+				//	enemykind = GetRand(5);
+				//}
+				//
+				//
+				//if (2 > enemykind)
+				//{
+				//	switch (enemykind)
+				//	{
+				//	case 0:
+				//		enemy[index] = karasu1;
+				//		break;
+				//	case 1:
+				//		enemy[index] = karasu2;
+				//	default:
+				//		break;
+				//	}
+
+				//	enemy[index].image.x = GAME_WIDTH;	
+				//	//enemy[index].image.y = 100 + GetRand(GAME_HEIGHT  - enemy[index].image.height - 100);	//敵の出現Y位置をランダム
+				//	
+
+				//	// 敵のY位置を3通りからランダムで選出
+				//	int enemy_y = GetRand(2);
+
+				//	switch (enemy_y)
+				//	{
+				//		case 0:
+				//			enemy[index].image.y = 100;
+				//			break;
+				//		case 1:
+				//			enemy[index].image.y = 350;
+				//			break;
+				//		case 2:
+				//			enemy[index].image.y = 580;
+				//			break;
+				//	}
+				//	
+				//	enemy[index].image.IsDraw = TRUE;	
+				//	//EnemyAtari(&enemy[index]);
+
+				//	enemy[index].IsCreate = TRUE;
+				//}
 			}
 		}
 
@@ -1211,27 +1287,28 @@ VOID MY_PLAY_PROC(VOID)
 	
 
 	//無敵時間
-	if (IsMuteki == TRUE)
+	if (IsMuteki == TRUE) //無敵状態になったら
 	{
 		mutekicount++;		//無敵時間を数えるカウントを増やす。
 
-		if (mutekicount >= 100)
+		if (mutekicount >= 100)	//無敵時間を数えるカウントが１００以上になれば
 		{
-			Ishit = TRUE;
-			IsMuteki = FALSE;
-			player.IsDraw = TRUE;
-			mutekicount = 0;
+			Ishit = TRUE;			//当たり判定をオンにする
+			IsMuteki = FALSE;		//無敵状態を解除する
+			player.IsDraw = TRUE;	//プレイヤーの画像を映す
+			mutekicount = 0;		//無敵時間を数えるカウントを０にする
 		}
-		else if (mutekicount <= 100)
+		else if (mutekicount <= 100)	//無敵時間を数えるカウントが１００以下になれば
 		{
-			Ishit = FALSE;	//当たり判定関数オフ
+			Ishit = FALSE;			//当たり判定関数オフ
 
-			if (tennmetu < 5) //点滅の時間間隔を設定
+			if (tennmetu < 5)		//点滅の時間を数えるカウントが５以下なら
 			{
-				tennmetu += 1;
+				tennmetu += 1;		//点滅時間を数えるカウントを増やす
 			}
 			else
 			{
+				//点滅させる
 				if (player.IsDraw == TRUE)
 				{
 					player.IsDraw = FALSE;
@@ -1241,7 +1318,7 @@ VOID MY_PLAY_PROC(VOID)
 					player.IsDraw = TRUE;
 				}
 
-				tennmetu = 0;
+				tennmetu = 0;	//点滅時間を数えるカウントを０にする
 			}
 
 		}
@@ -1250,7 +1327,7 @@ VOID MY_PLAY_PROC(VOID)
 
 
 	//レベルアップ
-	if (score >= 700) 
+	if (score >= 500) 
 	{
 		for (int num = 0; num < IMAGE_BACK_NUM; num++)
 		{
@@ -1344,8 +1421,17 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
+<<<<<<< HEAD
 			enemy[i].image.x = GAME_WIDTH + i * 100;
 		}
+=======
+			enemy[i].image.x = GAME_WIDTH/* + i * 100*/;
+		}/*
+		else if (enemy[i].image.x <= GAME_WIDTH)
+		{
+			enemy[i].image.IsDraw = TRUE;
+		}*/
+>>>>>>> d323d69de65375b7299a627ad615c4b7f57f59e9
 
 		int e;
 
@@ -1436,7 +1522,10 @@ VOID MY_PLAY_DRAW(VOID)
 	//デバッグ用
 	/*DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
 	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
+<<<<<<< HEAD
 	DrawFormatString(500, 40, GetColor(255, 0, 0), "Lvcount:%d", Lvcount);                */
+=======
+>>>>>>> d323d69de65375b7299a627ad615c4b7f57f59e9
 
 	return;
 }
@@ -1682,6 +1771,20 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageRuleBack.x = GAME_WIDTH / 2 - ImageRuleBack.width / 2;		                    //左右中央揃え
 	ImageRuleBack.y = GAME_HEIGHT / 2 - ImageRuleBack.height / 2;	                    //上下中央揃え
 
+
+	//ルール説明画像
+	strcpy_s(ImageRuleEx.path, IMAGE_RULE_EX_PATH);		    //パスの設定
+	ImageRuleEx.handle = LoadGraph(ImageRuleEx.path);	    //読み込み
+	if (ImageRuleEx.handle == -1)
+	{
+		//エラーメッセージ表示
+		MessageBox(GetMainWindowHandle(), IMAGE_RULE_EX_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageRuleEx.handle, &ImageRuleEx.width, &ImageRuleEx.height);	//画像の幅と高さを取得
+	ImageRuleEx.x = GAME_WIDTH / 2 - ImageRuleEx.width / 2;		                    //左右中央揃え
+	ImageRuleEx.y = GAME_HEIGHT / 2 - ImageRuleEx.height / 2;	                    //上下中央揃え
+	
 
 	//レベルアップ画像
 	strcpy_s(ImagePlayLevelup.path, IMAGE_PLAY_LEVELUP_PATH);		    //パスの設定
