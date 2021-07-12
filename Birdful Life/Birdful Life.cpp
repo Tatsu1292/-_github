@@ -1325,7 +1325,6 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(esa[i].x, esa[i].y, esa[i].handle, TRUE);
 		}
-		DrawBox(esa[i].x, esa[i].y, esa[i].x + esa[i].width, esa[i].y + esa[i].height, GetColor(255, 0, 0), FALSE);
 	}
 
 
@@ -1336,7 +1335,6 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(esakan[i].x, esakan[i].y, esakan[i].handle, TRUE);
 		}
-		DrawBox(esakan[i].x, esakan[i].y, esakan[i].x + esakan[i].width, esakan[i].y + esakan[i].height, GetColor(255, 0, 0), FALSE);
 	}
 
 	//敵の描画
@@ -1347,11 +1345,7 @@ VOID MY_PLAY_DRAW(VOID)
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
 			enemy[i].image.x = GAME_WIDTH + i * 100;
-		}/*
-		else if (enemy[i].image.x <= GAME_WIDTH)
-		{
-			enemy[i].image.IsDraw = TRUE;
-		}*/
+		}
 
 		int e;
 
@@ -1366,8 +1360,6 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(enemy[i].image.x, enemy[i].image.y, enemy[i].image.e_handle[e], TRUE);
 		}
-		DrawBox(enemy[i].rect.left, enemy[i].rect.top, enemy[i].rect.right, enemy[i].rect.bottom, GetColor(255, 0, 0), FALSE);
-
 	}
 
 
@@ -1386,8 +1378,6 @@ VOID MY_PLAY_DRAW(VOID)
 	{
 		DrawGraph(player.x, player.y, player.handle[a], TRUE);
 	}
-	DrawBox(player.x + 10, player.y + 30, player.x + player.width - 10, player.y + player.height, GetColor(255, 0, 0), FALSE);
-
 
 	
 	if (ImagePlayLevelup.IsDraw == TRUE)
@@ -1444,9 +1434,9 @@ VOID MY_PLAY_DRAW(VOID)
 	}
 
 	//デバッグ用
-	DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
+	/*DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
 	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
-	DrawFormatString(500, 40, GetColor(255, 0, 0), "Lvcount:%d", Lvcount);                
+	DrawFormatString(500, 40, GetColor(255, 0, 0), "Lvcount:%d", Lvcount);                */
 
 	return;
 }
@@ -2119,10 +2109,6 @@ void writeSubstring(char* message, int start, int len,
 VOID drawMessage()
 {
 	int i;
-
-	//メッセージボックス描画
-	//DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxGraphHandle, FALSE);
-	//DrawBox(MESSAGE_BOX_X, MESSAGE_BOX_Y, MESSAGE_BOX_X + 500, MESSAGE_BOX_Y + 100, GetColor(0, 255, 0), TRUE);
 
 	if (message[currentCursor] != '\0') {
 		currentCursor++;
