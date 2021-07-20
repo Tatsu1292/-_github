@@ -1027,9 +1027,10 @@ VOID MY_PLAY_PROC(VOID)
 					}
 				}
 
-
-				enemy[0].image.y = 100 + 100 * GetRand(2);
-				enemy[1].image.y = 400 + 100 * GetRand(2);
+				
+				enemy[index].image.y = 100 + 100 * GetRand(4);
+				
+				
 				/*enemy[index].image.y = 100 + GetRand(GAME_HEIGHT - enemy[index].image.height - 100);*/	//敵の出現Y位置をランダム
 				enemy[index].IsCreate = TRUE;
 				enemy[index].image.x = GAME_WIDTH;
@@ -1421,17 +1422,8 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			enemy[i].image.IsDraw = FALSE;
 			enemy[i].IsCreate = FALSE;
-<<<<<<< HEAD
 			enemy[i].image.x = GAME_WIDTH + i * 100;
 		}
-=======
-			enemy[i].image.x = GAME_WIDTH/* + i * 100*/;
-		}/*
-		else if (enemy[i].image.x <= GAME_WIDTH)
-		{
-			enemy[i].image.IsDraw = TRUE;
-		}*/
->>>>>>> d323d69de65375b7299a627ad615c4b7f57f59e9
 
 		int e;
 
@@ -1518,14 +1510,6 @@ VOID MY_PLAY_DRAW(VOID)
 			WordCount = 0;
 		}
 	}
-
-	//デバッグ用
-	/*DrawFormatString(500, 0, GetColor(255, 0, 0), "tekicount:%d", TekiCreateCnt);
-	DrawFormatString(500, 20, GetColor(255, 0, 0), "enemykind:%d", enemykind);
-<<<<<<< HEAD
-	DrawFormatString(500, 40, GetColor(255, 0, 0), "Lvcount:%d", Lvcount);                */
-=======
->>>>>>> d323d69de65375b7299a627ad615c4b7f57f59e9
 
 	return;
 }
